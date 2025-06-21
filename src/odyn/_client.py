@@ -2,6 +2,7 @@ from typing import Any
 from urllib.parse import urlparse
 
 import requests
+import requests.exceptions as requests_exceptions
 from loguru import logger as default_logger
 from loguru._logger import Logger
 
@@ -159,6 +160,62 @@ class Odyn:
                     f"Timeout must be greater than 0, got {timeout}"
                 )
         return timeout
+
+    def _request(
+        self,
+        url: str,
+        params: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
+        method: str = "GET",
+    ) -> dict[str, Any] | list[dict[str, Any]]:
+        """Send a request to the API.
+
+        Args:
+            url(str): The URL to send the request to.
+            params(dict[str, Any] | None): The parameters to send with the request.
+            headers(dict[str, str] | None): The headers to send with the request.
+            method(str): The HTTP method to use. Defaults to "GET".
+
+        Returns:
+            The response from the API as a dictionary or list of dictionaries.
+
+        Raises:
+            requests.exceptions.RequestException: For connection, timeout, or
+                other request-level errors.
+            requests.exceptions.HTTPError: For HTTP 4xx or 5xx status codes.
+            requests.exceptions.JSONDecodeError: If the response body cannot be
+                decoded as JSON.
+        """
+        # For more concise logging
+        request_details = (
+            f"method={method}, url={url}, params={params}, headers={headers}"
+        )
+
+        try:
+            response = self.session.request(
+                method=method,
+                url=url,
+                params=params,
+                headers=headers,
+                timeout=self.timeout,
+            )
+            self.logger.debug(
+                f"Request finished with status {response.status_code} "
+                f"for {request_details}"
+            )
+            response.raise_for_status()
+            data = response.json()
+            self.logger.debug(f"Successfully fetched data from {url}.")
+
+        except (
+            requests_exceptions.RequestException,
+            requests_exceptions.JSONDecodeError,
+        ) as e:
+            self.logger.exception(
+                f"Request failed: {e.__class__.__name__} for {request_details}. "
+            )
+            raise
+        return data
 
     def __repr__(self) -> str:
         """Return the string representation of the client.
