@@ -10,11 +10,8 @@ readme = "README.md"
 authors = [{name = "kon-fin", email = "erpsupport@konspec.com"}]
 requires-python = ">=3.12"
 dependencies = [
-    "fastexcel>=0.14.0",
     "loguru>=0.7.3",
-    "polars>=1.31.0",
     "requests>=2.32.4",
-    "xlsxwriter>=3.2.5",
 ]
 
 [project.scripts]
