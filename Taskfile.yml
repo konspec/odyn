@@ -1,0 +1,25 @@
+version: "3"
+
+tasks:
+  ruff:
+    desc: "Run Ruff linter and formatter against the project"
+    cmds:
+      - ruff check . --fix
+      - ruff format .
+
+  ty:
+    desc: "Run Ty type checker"
+    cmds:
+      - ty check .
+
+  test:
+    desc: "Run tests"
+    cmds:
+      - uv run pytest .
+
+  all:
+    desc: "Run all tasks"
+    deps:
+      - ruff
+      - ty
+      - test

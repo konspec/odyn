@@ -1,0 +1,63 @@
+# Pre-commit configuration for odyn project
+# See https://pre-commit.com for more information
+
+repos:
+  # Python code formatting and linting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.0
+    hooks:
+      - id: ruff-check
+        name: ruff-check
+        description: Run Ruff linter
+        args: [--fix]
+        types_or: [python, pyi]
+      - id: ruff-format
+        name: ruff-format
+        description: Run Ruff formatter
+        types_or: [python, pyi]
+
+  # General file checks and cleanup
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-ast
+        name: check-ast
+        description: Check Python AST validity
+      - id: check-yaml
+        name: check-yaml
+        description: Check YAML file syntax
+      - id: check-toml
+        name: check-toml
+        description: Check TOML file syntax
+      - id: check-json
+        name: check-json
+        description: Check JSON file syntax
+      - id: end-of-file-fixer
+        name: end-of-file-fixer
+        description: Ensure files end with newline
+      - id: trailing-whitespace
+        name: trailing-whitespace
+        description: Remove trailing whitespace
+      - id: check-added-large-files
+        name: check-added-large-files
+        description: Prevent large files from being committed
+        args: [--maxkb=1000]
+      - id: check-merge-conflict
+        name: check-merge-conflict
+        description: Check for merge conflict markers
+      - id: mixed-line-ending
+        name: mixed-line-ending
+        description: Check for mixed line endings
+        args: [--fix=lf]
+
+  # Commit message formatting and validation
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.8.3
+    hooks:
+      - id: commitizen
+        name: commitizen-check
+        description: Check commit message format
+      - id: commitizen-branch
+        name: commitizen-branch
+        description: Check branch naming convention
+        stages: [pre-push]
