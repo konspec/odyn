@@ -168,6 +168,7 @@ ignore = [
     "EM101",   # raw-string-in-exception
     "EM102",   # f-string-in-exception
     "G004",    # logging-f-string
+    "TRY004",  # type-check-without-type-error
 ]
 
 # Rules that should be auto-fixed
