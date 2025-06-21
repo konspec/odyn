@@ -12,3 +12,7 @@ class InvalidSessionError(OdynError):
 
 class InvalidLoggerError(OdynError):
     """Exception raised when an invalid logger is provided."""
+
+
+class InvalidTimeoutError(OdynError):
+    """Exception raised when an invalid timeout is provided."""
