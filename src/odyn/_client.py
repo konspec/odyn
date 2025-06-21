@@ -2,12 +2,21 @@ import requests
 from loguru import logger as default_logger
 from loguru._logger import Logger
 
-from odyn._exceptions import InvalidLoggerError, InvalidSessionError, InvalidURLError
+from odyn._exceptions import (
+    InvalidLoggerError,
+    InvalidSessionError,
+    InvalidTimeoutError,
+    InvalidURLError,
+)
 
 
 class Odyn:
     def __init__(
-        self, base_url: str, session: requests.Session, logger: Logger | None = None
+        self,
+        base_url: str,
+        session: requests.Session,
+        logger: Logger | None = None,
+        timeout: tuple[int, int] | tuple[float, float] | None = None,
     ):
         """Initialize the Odyn client.
 
@@ -16,10 +25,14 @@ class Odyn:
             session: The requests session to use for the client.
                 Any authentication should be handled by the session.
             logger: The logger to use for the client.
+            timeout: The timeout to use for the client.
         """
         self.base_url: str = self._validate_url(base_url)
         self.session: requests.Session = self._validate_session(session)
         self.logger: Logger = self._validate_logger(logger)
+        self.timeout: tuple[int, int] | tuple[float, float] = self._validate_timeout(
+            timeout
+        )
 
     def _validate_url(self, url: str) -> str:
         """Validate the URL.
@@ -64,3 +77,28 @@ class Odyn:
             error_msg: str = f"Logger must be a loguru.Logger, got {type(logger)}"
             raise InvalidLoggerError(error_msg)
         return logger
+
+    def _validate_timeout(
+        self, timeout: tuple[int, int] | tuple[float, float] | None
+    ) -> tuple[int, int] | tuple[float, float]:
+        """Validate the timeout.
+
+        Args:
+            timeout: The timeout to validate.
+        """
+        # Default timeout is 60 seconds
+        if timeout is None:
+            return (60, 60)
+        if not isinstance(timeout, tuple):
+            error_msg: str = f"Timeout must be a tuple, got {type(timeout)}"
+            raise InvalidTimeoutError(error_msg)
+        if len(timeout) != 2:
+            error_msg: str = f"Timeout must be a tuple of length 2, got {timeout}"
+            raise InvalidTimeoutError(error_msg)
+        if not all(isinstance(t, int | float) for t in timeout):
+            error_msg: str = f"Timeout must be a tuple of ints or floats, got {timeout}"
+            raise InvalidTimeoutError(error_msg)
+        if not all(t > 0 for t in timeout):
+            error_msg: str = f"Timeout must be greater than 0, got {timeout}"
+            raise InvalidTimeoutError(error_msg)
+        return timeout

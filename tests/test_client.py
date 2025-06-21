@@ -5,7 +5,13 @@ import requests
 from loguru import logger
 from loguru._logger import Logger
 
-from odyn import InvalidLoggerError, InvalidSessionError, InvalidURLError, Odyn
+from odyn import (
+    InvalidLoggerError,
+    InvalidSessionError,
+    InvalidTimeoutError,
+    InvalidURLError,
+    Odyn,
+)
 
 
 class TestOdynInitURL:
@@ -59,7 +65,7 @@ class TestOdynInitURL:
 class TestOdynInitSession:
     """Test the client initialization with a session."""
 
-    VALID_URL = "https://api.example.com"
+    VALID_URL: str = "https://api.example.com"
 
     class InvalidSession: ...
 
@@ -108,3 +114,51 @@ class TestOdynInitLogger:
         """Test the client initialization with no logger."""
         odyn: Odyn = Odyn(base_url=self.VALID_URL, session=self.SESSION)
         assert odyn.logger == self.VALID_LOGGER
+
+
+class TestOdynInitTimeout:
+    """Test the client initialization with a timeout."""
+
+    VALID_URL: str = "https://api.example.com"
+    SESSION: requests.Session = requests.Session()
+
+    def test_class_init_valid_timeout_int_tuple(self):
+        """Test the client initialization with a valid timeout."""
+        odyn: Odyn = Odyn(
+            base_url=self.VALID_URL, session=self.SESSION, timeout=(40, 40)
+        )
+        assert odyn.timeout == (40, 40)
+
+    def test_class_init_valid_timeout_float_tuple(self):
+        """Test the client initialization with a valid timeout."""
+        odyn: Odyn = Odyn(
+            base_url=self.VALID_URL, session=self.SESSION, timeout=(40.0, 40.0)
+        )
+        assert odyn.timeout == (40.0, 40.0)
+
+    @pytest.mark.parametrize(
+        "timeout",
+        [
+            1,
+            1.0,
+            "",
+            {1, 2},
+            [1, 2],
+            "invalid_timeout",
+            (0, 0),
+            (40, 40, 40),
+            (-10, 50),
+            (-50, -50),
+            (40, "abc"),
+            ("abc", 40),
+        ],
+    )
+    def test_class_init_invalid_timeout(self, timeout):
+        """Test the client initialization with an invalid timeout."""
+        with pytest.raises(InvalidTimeoutError):
+            Odyn(base_url=self.VALID_URL, session=self.SESSION, timeout=timeout)
+
+    def test_class_init_no_timeout(self):
+        """Test the client initialization with no timeout."""
+        odyn: Odyn = Odyn(base_url=self.VALID_URL, session=self.SESSION)
+        assert odyn.timeout == (60, 60)
