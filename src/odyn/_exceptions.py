@@ -16,3 +16,15 @@ class InvalidLoggerError(OdynError):
 
 class InvalidTimeoutError(OdynError):
     """Exception raised when an invalid timeout is provided."""
+
+
+class InvalidRetryError(OdynError):
+    """Exception raised when an invalid retry is provided."""
+
+
+class InvalidBackoffFactorError(OdynError):
+    """Exception raised when an invalid backoff factor is provided."""
+
+
+class InvalidStatusForcelistError(OdynError):
+    """Exception raised when an invalid status forcelist is provided."""
