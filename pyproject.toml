@@ -47,7 +47,7 @@ division-by-zero = "error"
 
 [tool.ruff]
 target-version = "py312"
-line-length = 88
+line-length = 120
 src = ["src"]
 exclude = [
     ".git",
