@@ -12,6 +12,29 @@ from odyn import (
     InvalidURLError,
     Odyn,
 )
+from odyn._client import TimeoutType
+
+
+class TestOdynRepr:
+    """Test the client representation."""
+
+    VALID_URL: str = "https://api.example.com"
+    SESSION: requests.Session = requests.Session()
+    VALID_LOGGER: Logger = logger
+    VALID_TIMEOUT: TimeoutType = (60, 60)
+
+    def test_class_repr_valid(self):
+        """Test the client representation with valid parameters."""
+        odyn: Odyn = Odyn(
+            base_url=self.VALID_URL,
+            session=self.SESSION,
+            logger=self.VALID_LOGGER,
+            timeout=self.VALID_TIMEOUT,
+        )
+        assert repr(odyn) == (
+            f"Odyn(base_url={self.VALID_URL}, session={self.SESSION}, "
+            f"logger={self.VALID_LOGGER}, timeout={self.VALID_TIMEOUT})"
+        )
 
 
 class TestOdynInitURL:
@@ -20,6 +43,8 @@ class TestOdynInitURL:
     VALID_URL_WITH_DOUBLE_SLASH: str = "https://api.example.com//"
     VALID_URL_WITH_LEADING_WHITESPACE: str = " https://api.example.com"
     VALID_URL_WITH_TRAILING_WHITESPACE: str = "https://api.example.com  "
+    FTP_URL: str = "ftp://api.example.com"
+    INVALID_URL: str = "invalid_url"
     SESSION: requests.Session = requests.Session()
 
     def test_class_init_valid_url(self):
@@ -60,6 +85,16 @@ class TestOdynInitURL:
         """Test the client initialization with an invalid URL."""
         with pytest.raises(InvalidURLError):
             Odyn(base_url=url, session=self.SESSION)
+
+    def test_class_init_invalid_url_type(self):
+        """Netlock is required."""
+        with pytest.raises(InvalidURLError):
+            Odyn(base_url=self.INVALID_URL, session=self.SESSION)
+
+    def test_class_init_invalid_ftp_url(self):
+        """FTP URLs are not allowed."""
+        with pytest.raises(InvalidURLError):
+            Odyn(base_url=self.FTP_URL, session=self.SESSION)
 
 
 class TestOdynInitSession:
