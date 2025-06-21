@@ -17,15 +17,24 @@ class Odyn:
         session: requests.Session,
         logger: Logger | None = None,
         timeout: tuple[int, int] | tuple[float, float] | None = None,
-    ):
+    ) -> None:
         """Initialize the Odyn client.
 
         Args:
-            base_url: The base URL of the OData service.
-            session: The requests session to use for the client.
+            base_url(str): The base URL of the OData service.
+            session(requests.Session): The requests session to use for the client.
                 Any authentication should be handled by the session.
-            logger: The logger to use for the client.
+            logger(Logger | None): The logger to use for the client.
             timeout: The timeout to use for the client.
+
+        Raises:
+            InvalidURLError: If the URL is invalid.
+            InvalidSessionError: If the session is invalid.
+            InvalidLoggerError: If the logger is invalid.
+            InvalidTimeoutError: If the timeout is invalid.
+
+        Returns:
+            None
         """
         self.base_url: str = self._validate_url(base_url)
         self.session: requests.Session = self._validate_session(session)
@@ -38,7 +47,13 @@ class Odyn:
         """Validate the URL.
 
         Args:
-            url: The URL to validate.
+            url(str): The URL to validate.
+
+        Raises:
+            InvalidURLError: If the URL is invalid.
+
+        Returns:
+            The validated URL.
         """
         if not isinstance(url, str):
             error_msg: str = f"URL must be a string, got {type(url)}"
@@ -58,7 +73,13 @@ class Odyn:
         """Validate the session.
 
         Args:
-            session: The session to validate.
+            session(requests.Session): The session to validate.
+
+        Raises:
+            InvalidSessionError: If the session is invalid.
+
+        Returns:
+            The validated session.
         """
         if not isinstance(session, requests.Session):
             error_msg: str = f"Session must be a requests.Session, got {type(session)}"
@@ -69,7 +90,13 @@ class Odyn:
         """Validate the logger.
 
         Args:
-            logger: The logger to validate.
+            logger(Logger | None): The logger to validate.
+
+        Raises:
+            InvalidLoggerError: If the logger is invalid.
+
+        Returns:
+            The validated logger.
         """
         if logger is None:
             return default_logger  # type: ignore[invalid-return-type]
@@ -85,6 +112,12 @@ class Odyn:
 
         Args:
             timeout: The timeout to validate.
+
+        Raises:
+            InvalidTimeoutError: If the timeout is invalid.
+
+        Returns:
+            The validated timeout.
         """
         # Default timeout is 60 seconds
         if timeout is None:
