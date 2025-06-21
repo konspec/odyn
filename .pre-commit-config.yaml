@@ -57,7 +57,3 @@ repos:
       - id: commitizen
         name: commitizen-check
         description: Check commit message format
-      - id: commitizen-branch
-        name: commitizen-branch
-        description: Check branch naming convention
-        stages: [pre-push]
