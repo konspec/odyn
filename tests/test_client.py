@@ -56,30 +56,22 @@ class TestOdynInitURL:
 
     def test_class_init_valid_url_with_trailing_slash(self):
         """Test the client initialization with a valid URL with a trailing slash."""
-        odyn: Odyn = Odyn(
-            base_url=self.VALID_URL_WITH_TRAILING_SLASH, session=self.SESSION
-        )
+        odyn: Odyn = Odyn(base_url=self.VALID_URL_WITH_TRAILING_SLASH, session=self.SESSION)
         assert odyn.base_url == self.VALID_URL
 
     def test_class_init_valid_url_with_double_slash(self):
         """Test the client initialization with a valid URL with a double slash."""
-        odyn: Odyn = Odyn(
-            base_url=self.VALID_URL_WITH_DOUBLE_SLASH, session=self.SESSION
-        )
+        odyn: Odyn = Odyn(base_url=self.VALID_URL_WITH_DOUBLE_SLASH, session=self.SESSION)
         assert odyn.base_url == self.VALID_URL
 
     def test_class_init_valid_url_with_leading_whitespace(self):
         """Test the client initialization with a valid URL with leading whitespace."""
-        odyn: Odyn = Odyn(
-            base_url=self.VALID_URL_WITH_LEADING_WHITESPACE, session=self.SESSION
-        )
+        odyn: Odyn = Odyn(base_url=self.VALID_URL_WITH_LEADING_WHITESPACE, session=self.SESSION)
         assert odyn.base_url == self.VALID_URL
 
     def test_class_init_valid_url_with_trailing_whitespace(self):
         """Test the client initialization with a valid URL with trailing whitespace."""
-        odyn: Odyn = Odyn(
-            base_url=self.VALID_URL_WITH_TRAILING_WHITESPACE, session=self.SESSION
-        )
+        odyn: Odyn = Odyn(base_url=self.VALID_URL_WITH_TRAILING_WHITESPACE, session=self.SESSION)
         assert odyn.base_url == self.VALID_URL
 
     @pytest.mark.parametrize("url", [1, 1.0, None, "", {1, 2}, [1, 2], "nohttps"])
@@ -133,9 +125,7 @@ class TestOdynInitLogger:
 
     def test_class_init_valid_logger(self):
         """Test the client initialization with a valid logger."""
-        odyn: Odyn = Odyn(
-            base_url=self.VALID_URL, session=self.SESSION, logger=self.VALID_LOGGER
-        )
+        odyn: Odyn = Odyn(base_url=self.VALID_URL, session=self.SESSION, logger=self.VALID_LOGGER)
         assert odyn.logger == self.VALID_LOGGER
 
     @pytest.mark.parametrize(
@@ -161,16 +151,12 @@ class TestOdynInitTimeout:
 
     def test_class_init_valid_timeout_int_tuple(self):
         """Test the client initialization with a valid timeout."""
-        odyn: Odyn = Odyn(
-            base_url=self.VALID_URL, session=self.SESSION, timeout=(40, 40)
-        )
+        odyn: Odyn = Odyn(base_url=self.VALID_URL, session=self.SESSION, timeout=(40, 40))
         assert odyn.timeout == (40, 40)
 
     def test_class_init_valid_timeout_float_tuple(self):
         """Test the client initialization with a valid timeout."""
-        odyn: Odyn = Odyn(
-            base_url=self.VALID_URL, session=self.SESSION, timeout=(40.0, 40.0)
-        )
+        odyn: Odyn = Odyn(base_url=self.VALID_URL, session=self.SESSION, timeout=(40.0, 40.0))
         assert odyn.timeout == (40.0, 40.0)
 
     @pytest.mark.parametrize(
@@ -238,14 +224,10 @@ class TestOdynRequest:
         mock_response.raise_for_status.assert_called_once()
         mock_response.json.assert_called_once()
         assert response_data == expected_data
-        odyn_client.logger.debug.assert_any_call(
-            f"Successfully fetched data from {test_url}."
-        )
+        odyn_client.logger.debug.assert_any_call(f"Successfully fetched data from {test_url}.")
 
     @patch("requests.Session.request")
-    def test_request_success_with_all_args(
-        self, mock_request: MagicMock, odyn_client: Odyn
-    ):
+    def test_request_success_with_all_args(self, mock_request: MagicMock, odyn_client: Odyn):
         """Test a successful request with custom method, params, and headers."""
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -273,9 +255,7 @@ class TestOdynRequest:
             timeout=odyn_client.timeout,
         )
         assert response_data == expected_data
-        odyn_client.logger.debug.assert_any_call(
-            f"Successfully fetched data from {test_url}."
-        )
+        odyn_client.logger.debug.assert_any_call(f"Successfully fetched data from {test_url}.")
 
     @patch("requests.Session.request")
     def test_request_http_error(self, mock_request: MagicMock, odyn_client: Odyn):
@@ -372,14 +352,10 @@ class TestOdynRequestMethod:
         mock_response.raise_for_status.assert_called_once()
         mock_response.json.assert_called_once()
         assert response_data == expected_data
-        odyn_client.logger.debug.assert_any_call(
-            f"Successfully fetched data from {test_url}."
-        )
+        odyn_client.logger.debug.assert_any_call(f"Successfully fetched data from {test_url}.")
 
     @patch("requests.Session.request")
-    def test_request_success_with_all_args(
-        self, mock_request: MagicMock, odyn_client: Odyn
-    ):
+    def test_request_success_with_all_args(self, mock_request: MagicMock, odyn_client: Odyn):
         """Test a successful request with custom method, params, and headers."""
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -407,9 +383,7 @@ class TestOdynRequestMethod:
             timeout=odyn_client.timeout,
         )
         assert response_data == expected_data
-        odyn_client.logger.debug.assert_any_call(
-            f"Successfully fetched data from {test_url}."
-        )
+        odyn_client.logger.debug.assert_any_call(f"Successfully fetched data from {test_url}.")
 
     @patch("requests.Session.request")
     def test_request_http_error(self, mock_request: MagicMock, odyn_client: Odyn):

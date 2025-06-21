@@ -1,5 +1,5 @@
 from typing import Any
-from urllib.parse import urlparse
+from urllib.parse import urlencode, urlparse
 
 import requests
 import requests.exceptions as requests_exceptions
@@ -49,9 +49,7 @@ class Odyn:
         self.logger: Logger = self._validate_logger(logger)
         self.timeout: TimeoutType = self._validate_timeout(timeout)
 
-    def _validate_type(
-        self, value: Any, expected_type: type, param_name: str, exception_class: type
-    ) -> None:
+    def _validate_type(self, value: Any, expected_type: type, param_name: str, exception_class: type) -> None:
         """Generic type validation helper.
 
         Args:
@@ -64,10 +62,7 @@ class Odyn:
             exception_class: If the type validation fails.
         """
         if not isinstance(value, expected_type):
-            error_msg: str = (
-                f"{param_name} must be a {expected_type.__name__}, "
-                f"got {type(value).__name__}"
-            )
+            error_msg: str = f"{param_name} must be a {expected_type.__name__}, got {type(value).__name__}"
             raise exception_class(error_msg)
 
     def _validate_url(self, url: str) -> str:
@@ -95,9 +90,7 @@ class Odyn:
             raise InvalidURLError(f"URL must contain a valid domain, got {url}")
 
         if not parsed.scheme or parsed.scheme not in ["http", "https"]:
-            raise InvalidURLError(
-                f"URL must have a valid scheme (http or https), got {url}"
-            )
+            raise InvalidURLError(f"URL must have a valid scheme (http or https), got {url}")
 
         return sanitized_url
 
@@ -147,18 +140,12 @@ class Odyn:
         """
         self._validate_type(timeout, tuple, "Timeout", InvalidTimeoutError)
         if len(timeout) != 2:
-            raise InvalidTimeoutError(
-                f"Timeout must be a tuple of length 2, got length {len(timeout)}"
-            )
+            raise InvalidTimeoutError(f"Timeout must be a tuple of length 2, got length {len(timeout)}")
         for _, value in enumerate(timeout):
             if not isinstance(value, int | float):
-                raise InvalidTimeoutError(
-                    f"Timeout must be a tuple of ints or floats, got {timeout}"
-                )
+                raise InvalidTimeoutError(f"Timeout must be a tuple of ints or floats, got {timeout}")
             if value <= 0:
-                raise InvalidTimeoutError(
-                    f"Timeout must be greater than 0, got {timeout}"
-                )
+                raise InvalidTimeoutError(f"Timeout must be greater than 0, got {timeout}")
         return timeout
 
     def _request(
@@ -187,9 +174,7 @@ class Odyn:
                 decoded as JSON.
         """
         # For more concise logging
-        request_details = (
-            f"method={method}, url={url}, params={params}, headers={headers}"
-        )
+        request_details = f"method={method}, url={url}, params={params}, headers={headers}"
 
         try:
             response = self.session.request(
@@ -199,10 +184,7 @@ class Odyn:
                 headers=headers,
                 timeout=self.timeout,
             )
-            self.logger.debug(
-                f"Request finished with status {response.status_code} "
-                f"for {request_details}"
-            )
+            self.logger.debug(f"Request finished with status {response.status_code} for {request_details}")
             response.raise_for_status()
             data = response.json()
             self.logger.debug(f"Successfully fetched data from {url}.")
@@ -211,10 +193,47 @@ class Odyn:
             requests_exceptions.RequestException,
             requests_exceptions.JSONDecodeError,
         ) as e:
-            self.logger.exception(
-                f"Request failed: {e.__class__.__name__} for {request_details}. "
-            )
+            self.logger.exception(f"Request failed: {e.__class__.__name__} for {request_details}. ")
             raise
+        return data
+
+    def _build_url(self, endpoint: str, params: dict[str, Any] | None = None) -> str:
+        """Build the URL for the request.
+
+        Args:
+            endpoint(str): The endpoint to build the URL for.
+            params(dict[str, Any] | None): The parameters to add to the URL.
+
+        Returns:
+            The built URL.
+        """
+        params = params or {}
+        url = f"{self.base_url}/{endpoint.strip('/').strip()}"
+        if params:
+            url += "?" + urlencode(params)
+        return url
+
+    def get(
+        self, endpoint: str, params: dict[str, Any] | None = None, headers: dict[str, str] | None = None
+    ) -> list[dict[str, Any]]:
+        """Send a GET request to the API. and get paginated data.
+
+        Args:
+            endpoint(str): The endpoint to send the request to.
+            params(dict[str, Any] | None): The parameters to send with the request.
+            headers(dict[str, str] | None): The headers to send with the request.
+
+        Returns:
+            The response from the API as a list of dictionaries.
+        """
+        url = self._build_url(endpoint, params)
+        data: list[dict[str, Any]] = []
+        while True:
+            response = self._request(url, headers=headers)
+            data.extend(response)
+            if "@odata.nextLink" not in response:
+                break
+            url = response["@odata.nextLink"]
         return data
 
     def __repr__(self) -> str:
@@ -223,7 +242,4 @@ class Odyn:
         Returns:
             The string representation of the client.
         """
-        return (
-            f"Odyn(base_url={self.base_url}, session={self.session}, "
-            f"logger={self.logger}, timeout={self.timeout})"
-        )
+        return f"Odyn(base_url={self.base_url}, session={self.session}, logger={self.logger}, timeout={self.timeout})"
