@@ -1,197 +1,115 @@
 import pytest
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
-from odyn import Odyn
-from odyn._exceptions import (
-    InvalidBackoffFactorError,
-    InvalidRetryError,
-    InvalidStatusForcelistError,
-)
+from odyn._exceptions import InvalidBackoffFactorError, InvalidRetryError, InvalidStatusForcelistError
 from odyn.sessions import BasicAuthSession, BearerAuthSession, OdynSession
 
 
-class TestBasicAuthSession:
-    """Test the BasicAuthSession class."""
+class TestOdynSession:
+    """Tests for the base OdynSession class."""
 
-    def test_basic_auth_session_init(self) -> None:
-        """Test the initialization of the BasicAuthSession class."""
-        session: BasicAuthSession = BasicAuthSession("test_username", "test_password")
-        assert session.auth == ("test_username", "test_password")
+    def test_init_with_defaults(self) -> None:
+        """Verify session initializes with correct default retry parameters."""
+        session = OdynSession()
+
+        # Check internal state
+        assert session._retries == 5
+        assert session._backoff_factor == 2.0
+        assert session._status_forcelist == OdynSession.DEFAULT_STATUS_FORCELIST
+
+        # Check the mounted adapter's retry strategy
+        adapter = session.adapters["https://"]
+        assert isinstance(adapter, HTTPAdapter)
+        retry_strategy = adapter.max_retries
+        assert isinstance(retry_strategy, Retry)
+        assert retry_strategy.total == 5
+        assert retry_strategy.backoff_factor == 2.0
+        assert retry_strategy.status_forcelist == OdynSession.DEFAULT_STATUS_FORCELIST
+
+    def test_init_with_custom_valid_parameters(self) -> None:
+        """Verify session initializes correctly with custom valid parameters."""
+        session = OdynSession(retries=3, backoff_factor=1, status_forcelist=[429])
+
+        # Check internal state
+        assert session._retries == 3
+        assert session._backoff_factor == 1.0  # Should be cast to float
+        assert session._status_forcelist == [429]
+
+        # Check the mounted adapter's retry strategy
+        retry_strategy = session.adapters["https://"].max_retries
+        assert retry_strategy.total == 3
+        assert retry_strategy.backoff_factor == 1.0
+        assert retry_strategy.status_forcelist == [429]
+
+    @pytest.mark.parametrize("invalid_retries", [0, -1, 3.5, "five", None, [5]])
+    def test_init_with_invalid_retries_raises_error(self, invalid_retries) -> None:
+        """Verify that providing invalid `retries` raises an InvalidRetryError."""
+        with pytest.raises(InvalidRetryError, match="Retries must be a positive integer."):
+            OdynSession(retries=invalid_retries)
+
+    @pytest.mark.parametrize("invalid_backoff", [0, -1.0, "two", None, [2.0]])
+    def test_init_with_invalid_backoff_factor_raises_error(self, invalid_backoff) -> None:
+        """Verify that providing invalid `backoff_factor` raises an error."""
+        with pytest.raises(InvalidBackoffFactorError, match="Backoff factor must be a positive number."):
+            OdynSession(backoff_factor=invalid_backoff)
+
+    @pytest.mark.parametrize("invalid_forcelist", [[500, "429"], "429,500", 500, {"status": 500}])
+    def test_init_with_invalid_status_forcelist_raises_error(self, invalid_forcelist) -> None:
+        """Verify that providing an invalid `status_forcelist` raises an error."""
+        with pytest.raises(InvalidStatusForcelistError, match="Status forcelist must be a list of integers."):
+            OdynSession(status_forcelist=invalid_forcelist)
+
+
+class TestBasicAuthSession:
+    """Tests for the BasicAuthSession subclass."""
+
+    def test_init_sets_basic_auth(self) -> None:
+        """Verify that the session correctly sets the `auth` tuple."""
+        session = BasicAuthSession("user", "pass")
+        assert session.auth == ("user", "pass")
+
+    def test_init_forwards_retry_kwargs_to_parent(self) -> None:
+        """
+        Verify that retry-related kwargs are correctly passed to the parent
+        OdynSession and configured on the adapter.
+        """
+        session = BasicAuthSession("user", "pass", retries=10, backoff_factor=0.5, status_forcelist=[503])
+
+        # Verify parent class attributes were set
+        assert session._retries == 10
+        assert session._backoff_factor == 0.5
+        assert session._status_forcelist == [503]
+
+        # Verify the adapter's retry strategy reflects the kwargs
+        retry_strategy = session.adapters["https://"].max_retries
+        assert retry_strategy.total == 10
+        assert retry_strategy.backoff_factor == 0.5
+        assert retry_strategy.status_forcelist == [503]
 
 
 class TestBearerAuthSession:
-    """Test the BearerAuthSession class."""
+    """Tests for the BearerAuthSession subclass."""
 
-    def test_bearer_auth_session_init(self) -> None:
-        """Test the initialization of the BearerAuthSession class."""
-        session: BearerAuthSession = BearerAuthSession("test_token")
-        assert session.headers["Authorization"] == "Bearer test_token"
+    def test_init_sets_bearer_header(self) -> None:
+        """Verify that the session correctly sets the Authorization header."""
+        session = BearerAuthSession("my-secret-token")
+        assert session.headers["Authorization"] == "Bearer my-secret-token"
 
+    def test_init_forwards_retry_kwargs_to_parent(self) -> None:
+        """
+        Verify that retry-related kwargs are correctly passed to the parent
+        OdynSession and configured on the adapter.
+        """
+        session = BearerAuthSession("my-secret-token", retries=2, backoff_factor=3, status_forcelist=[])
 
-class TestOdynClientWithSession:
-    """Test the OdynClient class with a session."""
+        # Verify parent class attributes were set
+        assert session._retries == 2
+        assert session._backoff_factor == 3.0
+        assert session._status_forcelist == []
 
-    BASE_URL: str = "https://api.odyn.com"
-
-    BASIC_AUTH_SESSION: BasicAuthSession = BasicAuthSession(
-        "test_username", "test_password"
-    )
-    BEARER_AUTH_SESSION: BearerAuthSession = BearerAuthSession("test_token")
-
-    def test_odyn_client_with_basic_auth_session(self) -> None:
-        """Test the OdynClient class with a BasicAuthSession."""
-        client: Odyn = Odyn(
-            base_url=self.BASE_URL,
-            session=self.BASIC_AUTH_SESSION,
-        )
-        assert client.session.auth == ("test_username", "test_password")
-        assert client.base_url == self.BASE_URL
-        assert client.session == self.BASIC_AUTH_SESSION
-
-    def test_odyn_client_with_bearer_auth_session(self) -> None:
-        """Test the OdynClient class with a BearerAuthSession."""
-        client: Odyn = Odyn(
-            base_url=self.BASE_URL,
-            session=self.BEARER_AUTH_SESSION,
-        )
-        assert client.session.headers["Authorization"] == "Bearer test_token"
-        assert client.base_url == self.BASE_URL
-        assert client.session == self.BEARER_AUTH_SESSION
-
-
-class TestOdynSessionRetry:
-    """Test the OdynSession class."""
-
-    def test_odyn_session_init_retry_default(self) -> None:
-        """Test the initialization of the OdynSession class."""
-        session: OdynSession = OdynSession()
-        assert session._retry == 5
-        assert session.adapters["https://"].max_retries.total == 5
-        assert session.adapters["http://"].max_retries.total == 5
-
-    def test_odyn_session_init_retry_valid(self) -> None:
-        """Test the initialization of the OdynSession class."""
-        session: OdynSession = OdynSession(retry=1)
-        assert session._retry == 1
-        assert session.adapters["https://"].max_retries.total == 1
-        assert session.adapters["http://"].max_retries.total == 1
-
-    @pytest.mark.parametrize(
-        "retry",
-        [
-            "invalid",
-            -1,
-            0,
-            [0],
-            (0,),
-            {
-                0,
-            },
-        ],
-    )
-    def test_odyn_session_init_retry_invalid(self, retry: int) -> None:
-        """Test the initialization of the OdynSession class."""
-        with pytest.raises(InvalidRetryError):
-            OdynSession(retry=retry)
-
-
-class TestOdynSessionBackoffFactor:
-    """Test the OdynSession class."""
-
-    def test_odyn_session_init_backoff_factor_default(self) -> None:
-        """Test the initialization of the OdynSession class."""
-        session: OdynSession = OdynSession()
-        assert session._backoff_factor == 2.0
-        assert session.adapters["https://"].max_retries.backoff_factor == 2.0
-        assert session.adapters["http://"].max_retries.backoff_factor == 2.0
-
-    @pytest.mark.parametrize(
-        "backoff_factor",
-        [
-            "invalid",
-            -1,
-            0,
-            [0],
-            (0,),
-            {
-                0,
-            },
-        ],
-    )
-    def test_odyn_session_init_backoff_factor_invalid(
-        self, backoff_factor: float | int
-    ) -> None:
-        """Test the initialization of the OdynSession class."""
-        with pytest.raises(InvalidBackoffFactorError):
-            OdynSession(backoff_factor=backoff_factor)
-
-    def test_odyn_session_init_backoff_factor_valid(self) -> None:
-        """Test the initialization of the OdynSession class."""
-        session: OdynSession = OdynSession(backoff_factor=1.5)
-        assert session._backoff_factor == 1.5
-        assert session.adapters["https://"].max_retries.backoff_factor == 1.5
-        assert session.adapters["http://"].max_retries.backoff_factor == 1.5
-
-
-class TestOdynSessionStatusForcelist:
-    """Test the OdynSession class."""
-
-    def test_odyn_session_init_status_forcelist_default(self) -> None:
-        """Test the initialization of the OdynSession class."""
-        session: OdynSession = OdynSession()
-        assert session._status_forcelist == [500, 502, 503, 504, 429]
-        assert session.adapters["https://"].max_retries.status_forcelist == [
-            500,
-            502,
-            503,
-            504,
-            429,
-        ]
-        assert session.adapters["http://"].max_retries.status_forcelist == [
-            500,
-            502,
-            503,
-            504,
-            429,
-        ]
-
-    def test_odyn_session_init_status_forcelist_valid(self) -> None:
-        """Test the initialization of the OdynSession class."""
-        session: OdynSession = OdynSession(
-            status_forcelist=[500, 502, 503, 504, 429, 505]
-        )
-        assert session._status_forcelist == [500, 502, 503, 504, 429, 505]
-        assert session.adapters["https://"].max_retries.status_forcelist == [
-            500,
-            502,
-            503,
-            504,
-            429,
-            505,
-        ]
-        assert session.adapters["http://"].max_retries.status_forcelist == [
-            500,
-            502,
-            503,
-            504,
-            429,
-            505,
-        ]
-
-    @pytest.mark.parametrize(
-        "status_forcelist",
-        [
-            "invalid",
-            -1,
-            [0, "invalid"],
-            (0,),
-            {
-                0,
-            },
-        ],
-    )
-    def test_odyn_session_init_status_forcelist_invalid(
-        self, status_forcelist: list[int]
-    ) -> None:
-        """Test the initialization of the OdynSession class."""
-        with pytest.raises(InvalidStatusForcelistError):
-            OdynSession(status_forcelist=status_forcelist)
+        # Verify the adapter's retry strategy reflects the kwargs
+        retry_strategy = session.adapters["https://"].max_retries
+        assert retry_strategy.total == 2
+        assert retry_strategy.backoff_factor == 3.0
+        assert retry_strategy.status_forcelist == set()

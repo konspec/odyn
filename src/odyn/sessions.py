@@ -1,3 +1,5 @@
+from typing import Any, ClassVar
+
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -10,114 +12,97 @@ from odyn._exceptions import (
 
 
 class OdynSession(requests.Session):
-    """Session for Odyn API requests."""
+    """A requests.Session enhanced with automatic retries on failures.
+
+    This session is configured to retry requests that fail due to specific
+    HTTP status codes or connection errors, with an exponential backoff strategy.
+    """
+
+    DEFAULT_STATUS_FORCELIST: ClassVar[list[int]] = [500, 502, 503, 504, 429]
 
     def __init__(
         self,
-        retry: int = 5,
+        retries: int = 5,
         backoff_factor: float = 2.0,
         status_forcelist: list[int] | None = None,
     ) -> None:
-        """Initialize the session."""
+        """Initializes the session with a retry strategy.
+
+        Args:
+            retries: The total number of times to retry a request.
+            backoff_factor: A factor to calculate the delay between retries.
+                (e.g., {backoff factor} * (2 ** ({number of total retries} - 1)))
+            status_forcelist: A list of HTTP status codes to force a retry on.
+                Defaults to [500, 502, 503, 504, 429].
+        """
         super().__init__()
-        self._retry = self._validate_retry(retry)
+
+        self._retries = self._validate_retries(retries)
         self._backoff_factor = self._validate_backoff_factor(backoff_factor)
+
+        if status_forcelist is None:
+            status_forcelist = self.DEFAULT_STATUS_FORCELIST
         self._status_forcelist = self._validate_status_forcelist(status_forcelist)
-        self._mount_retry_adapters()
 
-    def _validate_retry(self, retry: int) -> int:
-        """Validate the retry."""
-        if not isinstance(retry, int):
-            error_msg: str = "Retry must be an integer."
-            raise InvalidRetryError(error_msg)
-        if retry <= 0:
-            error_msg: str = "Retry must be greater than 0."
-            raise InvalidRetryError(error_msg)
-        return retry
+        self._mount_retry_adapter()
 
-    def _validate_backoff_factor(self, backoff_factor: float) -> float:
-        """Validate the backoff factor."""
-        if not isinstance(backoff_factor, float | int):
-            error_msg: str = "Backoff factor must be a float."
-            raise InvalidBackoffFactorError(error_msg)
-        if backoff_factor <= 0:
-            error_msg: str = "Backoff factor must be greater than 0."
-            raise InvalidBackoffFactorError(error_msg)
+    def _validate_retries(self, retries: int) -> int:
+        """Validates the retries parameter."""
+        if not isinstance(retries, int) or retries <= 0:
+            raise InvalidRetryError("Retries must be a positive integer.")
+        return retries
+
+    def _validate_backoff_factor(self, backoff_factor: float | int) -> float:
+        """Validates the backoff_factor parameter."""
+        if not isinstance(backoff_factor, int | float) or backoff_factor <= 0:
+            raise InvalidBackoffFactorError("Backoff factor must be a positive number.")
         return float(backoff_factor)
 
-    def _validate_status_forcelist(
-        self, status_forcelist: list[int] | None
-    ) -> list[int] | None:
-        """Validate the status forcelist."""
-        if status_forcelist is None:
-            return [500, 502, 503, 504, 429]
-        if not isinstance(status_forcelist, list):
-            error_msg: str = "Status forcelist must be a list of integers."
-            raise InvalidStatusForcelistError(error_msg)
-        if not all(isinstance(status, int) for status in status_forcelist):
-            error_msg: str = "Status forcelist must be a list of integers."
-            raise InvalidStatusForcelistError(error_msg)
-        return status_forcelist
+    def _validate_status_forcelist(self, status_list: list[int]) -> list[int]:
+        """Validates the status_forcelist parameter."""
+        if not isinstance(status_list, list) or not all(isinstance(status, int) for status in status_list):
+            raise InvalidStatusForcelistError("Status forcelist must be a list of integers.")
+        return status_list
 
-    def _mount_retry_adapters(self) -> None:
-        """Mount the retry adapters."""
-        retry_strategy: Retry = Retry(
-            total=self._retry,
+    def _mount_retry_adapter(self) -> None:
+        """Creates and mounts the HTTPAdapter with the retry strategy."""
+        retry_strategy = Retry(
+            total=self._retries,
             backoff_factor=self._backoff_factor,
             status_forcelist=self._status_forcelist,
         )
-        adapter: HTTPAdapter = HTTPAdapter(max_retries=retry_strategy)
+        adapter = HTTPAdapter(max_retries=retry_strategy)
         self.mount("https://", adapter)
         self.mount("http://", adapter)
 
 
 class BasicAuthSession(OdynSession):
-    """Session for Odyn API requests with basic authentication."""
+    """An OdynSession that uses Basic Authentication."""
 
-    def __init__(
-        self,
-        username: str,
-        password: str,
-        retry: int = 5,
-        backoff_factor: float = 2,
-        status_forcelist: list[int] | None = None,
-    ) -> None:
-        """Initialize the session with basic authentication.
+    def __init__(self, username: str, password: str, **kwargs: Any) -> None:
+        """Initializes the session with Basic Authentication.
 
         Args:
-            username: The username to use for basic authentication.
-            password: The password to use for basic authentication.
-            retry: The number of times to retry the request.
-            backoff_factor: The factor to use for the backoff.
-            status_forcelist: The list of status codes to force retry.
-
-        Returns:
-            None
+            username: The username for Basic Authentication.
+            password: The password for Basic Authentication.
+            **kwargs: Keyword arguments passed to the parent OdynSession.
+                (e.g., retries, backoff_factor, status_forcelist)
         """
-        super().__init__(retry, backoff_factor, status_forcelist)
+        super().__init__(**kwargs)
         self.auth = (username, password)
 
 
 class BearerAuthSession(OdynSession):
-    """Session for Odyn API requests with bearer authentication."""
+    """An OdynSession that uses Bearer Token Authentication."""
 
-    def __init__(
-        self,
-        token: str,
-        retry: int = 5,
-        backoff_factor: float = 2,
-        status_forcelist: list[int] | None = None,
-    ) -> None:
-        """Initialize the session with bearer authentication.
+    def __init__(self, token: str, **kwargs: Any) -> None:
+        """Initializes the session with Bearer Token Authentication.
 
         Args:
-            token: The token to use for bearer authentication.
-            retry: The number of times to retry the request.
-            backoff_factor: The factor to use for the backoff.
-            status_forcelist: The list of status codes to force retry.
-
-        Returns:
-            None
+            token: The bearer token for authentication.
+            **kwargs: Keyword arguments passed to the parent OdynSession.
+                      (e.g., retries, backoff_factor, status_forcelist)
         """
-        super().__init__(retry, backoff_factor, status_forcelist)
+        # Pass all retry-related arguments to the parent class
+        super().__init__(**kwargs)
         self.headers.update({"Authorization": f"Bearer {token}"})
