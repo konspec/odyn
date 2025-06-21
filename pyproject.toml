@@ -143,33 +143,36 @@ select = [
 # Rules to ignore for practicality
 ignore = [
     # Docstring flexibility
-    "D100",    # Missing docstring in public module
-    "D104",    # Missing docstring in public package
-    "D107",    # Missing docstring in __init__
-    "D203",    # 1 blank line required before class docstring (conflicts with D211)
-    "D213",    # Multi-line docstring summary should start at the second line (conflicts with D212)
+    "D100",    # undocumented-public-module
+    "D104",    # undocumented-public-package
+    "D107",    # undocumented-public-init
+    "D203",    # incorrect-blank-line-before-class
+    "D213",    # multi-line-summary-second-line
 
     # Type annotation flexibility
-    "ANN204",  # Missing return type annotation for special method
+    "ANN204",  # missing-return-type-special-method
 
     # Formatter conflicts
-    "COM812",  # Trailing comma missing (conflicts with formatter)
-    "ISC001",  # Implicitly concatenated string literals on one line (conflicts with formatter)
+    "COM812",  # missing-trailing-comma
+    "ISC001",  # single-line-implicit-string-concatenation
 
     # Practical exceptions
-    "S101",    # Use of assert detected (common in tests)
-    "PLR0913", # Too many arguments to function call (sometimes necessary)
-    "PLR2004", # Magic value used in comparison (sometimes overly strict)
-    "TD002",   # Missing author in TODO
-    "TD003",   # Missing issue link on the line following TODO
-    "FIX002",  # Line contains TODO (allow TODOs)
-    "ANN401",  # Any not allowed in type annotations
+    "S101",    # assert
+    "PLR0913", # too-many-arguments
+    "PLR2004", # magic-value-comparison
+    "TD002",   # missing-todo-author
+    "TD003",   # missing-todo-link
+    "FIX002",  # line-contains-todo
+    "ANN401",  # any-type
+    "TRY003",  # raise-vanilla-args
+    "EM101",   # raw-string-in-exception
+    "EM102",   # f-string-in-exception
 ]
 
 # Rules that should be auto-fixed
 unfixable = [
-    "F841",   # Unused variables
-    "ERA001", # Commented-out code
+    "F841",   # unused-variable
+    "ERA001", # commented-out-code
 ]
 
 [tool.ruff.lint.pycodestyle]
@@ -178,26 +181,26 @@ max-doc-length = 88
 [tool.ruff.lint.per-file-ignores]
 # Test files
 "tests/**/*.py" = [
-    "S101",     # Allow assert in tests
-    "PLR2004",  # Allow magic values in tests
-    "PLC0415",  # Import must be top level
-    "ANN",      # No type annotations required
-    "D",        # No docstrings required
-    "SLF001",   # Allow private member access
-    "PT011",    # pytest.raises too broad
-    "ARG001",   # Unused function arguments (fixtures)
-    "BLE001",   # Blindly catching exceptions in tests
-    "INP001",   # __init__ for tests folder
-    "B018",     # Must assign data to a variable
-    "S105",     # Hard coded token in test files
-    "S106",     # Hard coded passwords in test files
-    "F401",     # Unused imports
+    "S101",     # assert
+    "PLR2004",  # magic-value-comparison
+    "PLC0415",  # import-outside-top-level
+    "ANN",      # flake8-annotations
+    "D",        # pydocstyle
+    "SLF001",   # private-member-access
+    "PT011",    # pytest-raises-too-broad
+    "ARG001",   # unused-function-argument
+    "BLE001",   # blind-except
+    "INP001",   # implicit-namespace-package
+    "B018",     # useless-expression
+    "S105",     # hardcoded-password-string
+    "S106",     # hardcoded-password-func-arg
+    "F401",     # unused-import
 ]
 
 "examples/**/*.py" = [
-    "S105",     # Hard coded token in test files
-    "S106",     # Hard coded passwords in test files
-    "T201",     # Print statements allowed in examples
+    "S105",     # hardcoded-password-string
+    "S106",     # hardcoded-password-func-arg
+    "T201",     # print
 ]
 
 [tool.ruff.lint.pydocstyle]
