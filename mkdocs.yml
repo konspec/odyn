@@ -1,0 +1,62 @@
+site_name: Odyn Documentation
+site_url: https://kon-fin.github.io/odyn/ # Replace with your actual GitHub Pages URL
+repo_url: https://github.com/kon-fin/odyn # Replace with your actual GitHub repository URL
+edit_uri: edit/main/docs/ # Allows users to suggest edits to your documentation
+
+theme:
+  name: material
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.annotation
+    - content.code.copy
+  language: en
+  icon:
+    repo: fontawesome/brands/github-alt
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.mark
+  - attr_list
+  - md_in_html
+  - tables
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Getting Started: getting-started.md
+  - Usage:
+    - Odyn Client: usage/odyn.md
+    - Sessions: usage/sessions.md
+    - Exceptions: usage/exceptions.md
+  - Advanced:
+    - Configuration: advanced/configuration.md
+    - Logging: advanced/logging.md
+  - Contributing: contributing.md
+  - Troubleshooting: troubleshooting.md
+  - FAQ: faq.md

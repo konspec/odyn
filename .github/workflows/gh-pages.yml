@@ -1,0 +1,37 @@
+name: Deploy Documentation to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # Or your default branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Allows the action to push to the gh-pages branch
+      pages: write # Allows the action to deploy to GitHub Pages
+      id-token: write # Allows the action to authenticate with GitHub Pages
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12" # Matches your project's Python version
+
+      - name: Install dependencies
+        run: |
+          pip install uv
+          uv sync --dev # Installs dependencies from pyproject.toml, including mkdocs
+
+      - name: Build documentation
+        run: mkdocs gh-deploy --force --clean --remote-branch gh-pages
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4 # Use the official GitHub Pages action
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site # Default output directory for mkdocs build
+          # publish_branch: gh-pages # The branch the action should deploy to (already handled by mkdocs gh-deploy)
