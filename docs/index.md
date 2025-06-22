@@ -78,4 +78,4 @@ print(f"Retrieved {len(customers)} customers")
 
 ## License
 
-This project is licensed under the terms specified in the [LICENSE](../LICENSE) file.
+This project is licensed under the terms specified in the [LICENSE](LICENSE) file.
