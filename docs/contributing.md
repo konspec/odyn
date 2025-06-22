@@ -1,347 +1,120 @@
 # Contributing to Odyn
 
-Thank you for your interest in contributing to Odyn! This guide will help you get started with development and contributing to the project.
-
-## Table of Contents
-
-- [Getting Started](#getting-started)
-- [Development Setup](#development-setup)
-- [Code Style](#code-style)
-- [Testing](#testing)
-- [Pull Request Process](#pull-request-process)
-- [Reporting Issues](#reporting-issues)
-- [Code of Conduct](#code-of-conduct)
+First off, thank you for considering contributing to Odyn! Your help is greatly appreciated. This guide will provide everything you need to get started with development.
 
 ## Getting Started
 
-### Prerequisites
+Ready to contribute? Here’s how to set up `odyn` for local development.
 
-- Python 3.12 or higher
-- Git
-- A GitHub account
+### 1. Fork and Clone the Repository
 
-### Fork and Clone
-
-1. Fork the repository on GitHub
-2. Clone your fork locally:
-   ```bash
-   git clone https://github.com/your-username/odyn.git
-   cd odyn
-   ```
-
-## Development Setup
-
-### 1. Create a Virtual Environment
+If you haven't done so already, fork the repository on GitHub. Then, clone your fork to your local machine:
 
 ```bash
-# Using venv (recommended)
+git clone https://github.com/your-username/odyn.git
+cd odyn
+```
+
+### 2. Set Up Your Development Environment
+
+We use [uv](https://github.com/astral-sh/uv) for project and environment management. It's a fast, all-in-one tool that handles virtual environments and package installation.
+
+First, create and activate a virtual environment. `uv` will automatically use it.
+
+```bash
+# Create the virtual environment
 python -m venv .venv
 
-# Activate the virtual environment
+# Activate it
 # On Windows:
 .venv\Scripts\activate
 # On macOS/Linux:
 source .venv/bin/activate
 ```
 
-### 2. Install Dependencies
+### 3. Install Dependencies
+
+Next, install the project dependencies. The following command installs the `odyn` package in editable mode along with all development dependencies defined in `pyproject.toml`.
 
 ```bash
-# Install the package in development mode
-pip install -e .
-
-# Install development dependencies
-pip install -r requirements-dev.txt
-# Or if using uv:
-uv pip install -e .
-uv pip install -r requirements-dev.txt
+# Install all dependencies using uv
+uv pip install -e .[dev]
 ```
 
-### 3. Install Pre-commit Hooks
+### 4. Set Up Pre-commit Hooks
+
+We use pre-commit hooks to ensure code style and quality are maintained automatically. To set them up, run:
 
 ```bash
-# Install pre-commit hooks
 pre-commit install
-
-# Run pre-commit on all files (optional)
-pre-commit run --all-files
+pre-commit install --hook-type=commit-msg
+pre-commit install --hook-type=pre-push
 ```
 
-## Code Style
+This will run checks automatically every time you make a commit.
 
-Odyn follows strict code style guidelines to maintain consistency and quality.
+## Development Workflow
 
-### Python Code Style
+With your environment set up, you're ready to start coding!
 
-- **Ruff**: Code formatting, linting, and import sorting
-- **Type Hints**: Required for all public APIs
-- **Docstrings**: Google-style docstrings for all public functions and classes
+### Running Checks and Tests
 
-### Running Code Quality Checks
+We use `Taskfile` to provide simple commands for common development tasks.
+
+- **To run all linters, formatters, and type checkers:**
+  ```bash
+  task ruff ty
+  ```
+
+- **To run the full test suite:**
+  ```bash
+  task test
+  ```
+
+- **To run everything (all checks and tests):**
+  ```bash
+  task all
+  ```
+
+You can also run tools individually, for example, using `pytest` directly:
 
 ```bash
-# Format and lint with Ruff
-ruff check src/ tests/
-ruff format src/ tests/
-
-# Type checking with mypy
-mypy src/
-
-# Run all checks
-pre-commit run --all-files
-```
-
-### Code Style Examples
-
-#### Type Hints
-```python
-# ✅ Good
-def get_customers(self, params: dict[str, Any] | None = None) -> list[dict[str, Any]]:
-    """Get customers from the API."""
-    pass
-
-# ❌ Avoid
-def get_customers(self, params=None):
-    """Get customers from the API."""
-    pass
-```
-
-#### Docstrings
-```python
-# ✅ Good - Google style
-def validate_url(self, url: str) -> str:
-    """Validates and sanitizes the URL to ensure it is a valid base for API calls.
-
-    Args:
-        url: The base URL string to validate.
-
-    Returns:
-        The sanitized URL, guaranteed to end with a "/".
-
-    Raises:
-        InvalidURLError: If the URL is empty, has an invalid scheme, or is missing a domain.
-    """
-    pass
-```
-
-## Testing
-
-### Running Tests
-
-```bash
-# Run all tests with coverage (recommended)
-./scripts/test.sh
-
-# On Windows
-scripts\test.bat
-
-# Run tests with verbose output
-./scripts/test.sh --verbose
-
-# Run only tests (skip linting and type checking)
-./scripts/test.sh --no-lint --no-type-check
-
-# Run all tests
-pytest
-
-# Run tests with coverage
+# Run tests with coverage report
 pytest --cov=odyn --cov-report=html
 
 # Run tests in parallel
 pytest -n auto
-
-# Run specific test file
-pytest tests/test_client.py
-
-# Run tests with verbose output
-pytest -v
 ```
 
-### Writing Tests
+### Writing Code
 
-- Tests should be in the `tests/` directory
-- Use descriptive test names
-- Test both success and failure cases
-- Mock external dependencies
-- Use fixtures for common setup
+- **Branching**: Create a descriptive branch for your work (e.g., `feature/new-auth-session`, `fix/url-validation-bug`).
+- **Code Style**: We use [Ruff](https://docs.astral.sh/ruff/) for formatting and linting. The pre-commit hooks will handle this automatically.
+- **Type Hints**: All public APIs must include type hints.
+- **Docstrings**: All public functions and classes should have Google-style docstrings.
 
-#### Test Example
+### Submitting a Pull Request
 
-```python
-import pytest
-from odyn import Odyn, BearerAuthSession, InvalidURLError
+Once your changes are ready, it's time to create a pull request.
 
-class TestOdynClient:
-    """Tests for the Odyn client."""
+1.  **Commit Your Changes**: We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification.
+    ```bash
+    git commit -m "feat(auth): add support for OAuth2 sessions"
+    ```
 
-    def test_init_with_valid_url(self):
-        """Test that client initializes with valid URL."""
-        session = BearerAuthSession("test-token")
-        client = Odyn(
-            base_url="https://api.example.com/",
-            session=session
-        )
-        assert client.base_url == "https://api.example.com/"
+2.  **Push to Your Fork**:
+    ```bash
+    git push origin feature/your-feature-name
+    ```
 
-    def test_init_with_invalid_url_raises_error(self):
-        """Test that invalid URL raises InvalidURLError."""
-        session = BearerAuthSession("test-token")
-        with pytest.raises(InvalidURLError, match="URL cannot be empty"):
-            Odyn(base_url="", session=session)
-```
-
-### Test Coverage
-
-We aim for high test coverage. Run coverage reports to ensure new code is well-tested:
-
-```bash
-pytest --cov=odyn --cov-report=term-missing
-```
-
-## Pull Request Process
-
-### 1. Create a Feature Branch
-
-```bash
-git checkout -b feature/your-feature-name
-# or
-git checkout -b fix/your-bug-fix
-```
-
-### 2. Make Your Changes
-
-- Write clear, descriptive commit messages
-- Follow the code style guidelines
-- Add tests for new functionality
-- Update documentation if needed
-
-### 3. Commit Your Changes
-
-```bash
-# Stage your changes
-git add .
-
-# Commit with a descriptive message
-git commit -m "feat: add new authentication method
-
-- Add OAuth2 authentication support
-- Include comprehensive tests
-- Update documentation"
-```
-
-### 4. Push and Create Pull Request
-
-```bash
-git push origin feature/your-feature-name
-```
-
-Then create a pull request on GitHub with:
-
-- **Clear title**: Describe the change concisely
-- **Description**: Explain what and why, not how
-- **Related issues**: Link to any related issues
-- **Checklist**: Ensure all requirements are met
-
-### 5. Pull Request Checklist
-
-Before submitting, ensure:
-
-- [ ] Code follows style guidelines
-- [ ] Tests pass and coverage is maintained
-- [ ] Documentation is updated
-- [ ] Type hints are added
-- [ ] Pre-commit hooks pass
-- [ ] No breaking changes (or clearly documented)
+3.  **Open a Pull Request**: On GitHub, open a pull request from your fork to the `main` branch of the original repository. Provide a clear title and a detailed description of your changes. Link to any relevant issues.
 
 ## Reporting Issues
 
-### Bug Reports
+If you find a bug or have a feature request, please [open an issue](https://github.com/kon-fin/odyn/issues). Provide as much detail as possible, including:
+- A clear and descriptive title.
+- Steps to reproduce the issue.
+- The expected and actual behavior.
+- Your environment details (Python version, OS, Odyn version).
 
-When reporting bugs, please include:
-
-1. **Environment**: Python version, OS, Odyn version
-2. **Steps to reproduce**: Clear, step-by-step instructions
-3. **Expected behavior**: What you expected to happen
-4. **Actual behavior**: What actually happened
-5. **Error messages**: Full error traceback
-6. **Code example**: Minimal code to reproduce the issue
-
-### Feature Requests
-
-For feature requests, please include:
-
-1. **Use case**: Why this feature is needed
-2. **Proposed solution**: How you envision it working
-3. **Alternatives considered**: Other approaches you've thought about
-
-## Code of Conduct
-
-### Our Standards
-
-We are committed to providing a welcoming and inspiring community for all. Please:
-
-- Be respectful and inclusive
-- Focus on what is best for the community
-- Show empathy towards other community members
-
-### Enforcement
-
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project maintainers.
-
-## Development Workflow
-
-### Branch Naming
-
-- `feature/` - New features
-- `fix/` - Bug fixes
-- `docs/` - Documentation updates
-- `refactor/` - Code refactoring
-- `test/` - Test improvements
-
-### Commit Message Format
-
-We follow [Conventional Commits](https://www.conventionalcommits.org/):
-
-```
-<type>[optional scope]: <description>
-
-[optional body]
-
-[optional footer(s)]
-```
-
-Types:
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes
-- `refactor`: Code refactoring
-- `test`: Test changes
-- `chore`: Maintenance tasks
-
-### Release Process
-
-1. **Version bump**: Update version in `pyproject.toml`
-2. **Changelog**: Update `CHANGELOG.md`
-3. **Tag**: Create a git tag
-4. **Release**: Create GitHub release
-5. **Publish**: Publish to PyPI
-
-## Getting Help
-
-If you need help with development:
-
-- Check the [documentation](index.md)
-- Look at existing issues and pull requests
-- Ask questions in GitHub discussions
-- Contact the maintainers
-
-## Recognition
-
-Contributors will be recognized in:
-
-- The project README
-- Release notes
-- GitHub contributors page
-
-Thank you for contributing to Odyn! 🚀
+Thank you for contributing!
