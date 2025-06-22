@@ -18,6 +18,8 @@
 
 ---
 
+[PyPi link](https://pypi.org/project/odyn)
+
 Odyn provides a convenient and feature-rich interface for interacting with Microsoft Dynamics 365 Business Central, including automatic retry mechanisms, pagination handling, and pluggable authentication sessions.
 
 ## Features
