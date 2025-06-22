@@ -1,3 +1,9 @@
+## v1.0.2 (2025-06-22)
+
+### Refactor
+
+- Refactored tests
+
 ## v1.0.1 (2025-06-22)
 
 ### Refactor
