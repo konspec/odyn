@@ -1,150 +1,186 @@
-# Installation
+# Installation Guide
 
-This guide covers how to install Odyn in your project. We strongly recommend using a virtual environment to manage dependencies.
+This document is the definitive guide to installing Odyn. Whether you are using Odyn in your application or contributing to its development, please follow these instructions carefully.
+
+Odyn is a modern, typed, and robust Python client for the Microsoft Dynamics 365 Business Central OData V4 API.
 
 ## Prerequisites
 
-- **Python 3.12 or higher**
-- A virtual environment (see below for setup instructions)
+Before you begin, ensure your development environment meets these requirements.
 
-## Using a Virtual Environment
+### Python Version
 
-Using a virtual environment is crucial for isolating project dependencies and avoiding conflicts.
+- **Python 3.12 or newer is required.**
 
-### Recommended: `uv`
+Odyn leverages modern Python features for performance, correctness, and type safety.
 
-[uv](https://github.com/astral-sh/uv) is a modern, extremely fast Python package installer and resolver.
+To check your Python version, run:
+```bash
+# This command should output "Python 3.12.x" or higher
+python3 --version
+
+# On Windows, you might use the Python Launcher:
+py --version
+```
+If you have multiple Python versions, ensure you are using `python3` or `py -3.12` consistently.
+
+### Virtual Environment
+
+- **A virtual environment is essential for all Python projects.**
+
+A virtual environment isolates your project's dependencies from your system's global Python installation. This prevents version conflicts and ensures your application has a consistent, reproducible set of packages. **Do not skip this step.**
+
+---
+
+## Part 1: Standard Installation (For Users)
+
+Follow these steps to use Odyn in your own project.
+
+### Step 1: Create and Activate a Virtual Environment
+
+Choose one of the following methods. We recommend `uv` for its speed.
+
+#### Recommended: Using `uv`
+[uv](https://github.com/astral-sh/uv) is an extremely fast, next-generation Python package manager.
 
 ```bash
-# Create and activate a virtual environment in one step
+# Install uv if you don't have it
+pip install uv
+
+# Create and activate a virtual environment named .venv
 uv venv
-
-# On macOS/Linux:
-source .venv/bin/activate
-
-# On Windows:
-.venv\\Scripts\\activate
+source .venv/bin/activate  # On macOS/Linux
+# .venv\Scripts\activate   # On Windows
 ```
 
-### Standard: `venv`
-
-You can also use Python's built-in `venv` module.
+#### Standard: Using `venv`
+`venv` is Python's built-in tool for creating virtual environments.
 
 ```bash
-# Create a virtual environment
-python -m venv .venv
+# Create a virtual environment named .venv
+python3 -m venv .venv
 
-# Activate it
-# On macOS/Linux:
-source .venv/bin/activate
-
-# On Windows:
-.venv\\Scripts\\activate
+# Activate the environment
+source .venv/bin/activate  # On macOS/Linux
+# .venv\Scripts\activate   # On Windows
 ```
+After activation, your command prompt will typically be prefixed with `(.venv)`, indicating the virtual environment is active.
 
-## Production Installation
+### Step 2: Install Odyn
 
-Once your virtual environment is activated, you can install Odyn using your preferred tool.
+With your virtual environment active, install Odyn.
 
-### Recommended: `uv`
-
+#### Recommended: Using `uv`
 ```bash
 # Install the latest version of Odyn
 uv pip install odyn
+
+# To install a specific version for reproducible builds:
+uv pip install odyn==0.1.0
 ```
 
-To upgrade to the latest version:
-
-```bash
-uv pip install --upgrade odyn
-```
-
-### Standard: `pip`
-
+#### Standard: Using `pip`
 ```bash
 # Install the latest version of Odyn
 pip install odyn
+
+# To install a specific version for reproducible builds:
+pip install odyn==0.1.0
 ```
 
-To upgrade to the latest version:
-```bash
-pip install --upgrade odyn
-```
+### Step 3: Verify the Installation
 
-### Poetry
-
-If you use Poetry for dependency management:
-
-```bash
-poetry add odyn
-```
-
-## Development Installation
-
-If you plan to contribute to Odyn, you need to install it in editable mode with its development dependencies.
-
-### Recommended: `uv`
-
-This is the fastest and recommended way to set up a development environment.
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/konspec/odyn.git
-cd odyn
-
-# 2. Create a virtual environment and install dependencies
-uv venv
-source .venv/bin/activate # Or .venv\Scripts\activate on Windows
-uv pip install -e .[dev]
-
-# 3. Verify the installation
-ruff check .
-pytest
-```
-
-### `pip` and `venv`
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/konspec/odyn.git
-cd odyn
-
-# 2. Create a virtual environment and activate it
-python -m venv .venv
-source .venv/bin/activate # Or .venv\Scripts\activate on Windows
-
-# 3. Install in editable mode with development dependencies
-pip install -e .[dev]
-```
-
-## Verification
-
-After installation, you can verify that Odyn is installed correctly by running this snippet. No output means it was successful.
+Create a Python file (e.g., `test_odyn.py`) and run it to confirm Odyn is installed correctly.
 
 ```python
+# test_odyn.py
 try:
     from odyn import Odyn, BearerAuthSession
-    print("Odyn was imported successfully.")
+    print("✅ Odyn was imported successfully.")
 except ImportError as e:
-    print(f"Failed to import Odyn: {e}")
-
+    print(f"❌ Failed to import Odyn: {e}")
 ```
 
-## Troubleshooting
+Running `python test_odyn.py` should print a success message.
 
-### Common Installation Issues
+---
 
-**Python Version Error**
-- **Error**: `ERROR: Package 'odyn' requires a different Python...`
-- **Solution**: Ensure you are using Python 3.12 or higher. Check with `python --version`.
+## Part 2: Development Setup (For Contributors)
 
-**Permission Errors**
-- **Error**: `ERROR: Could not install packages due to an OSError: [Errno 13] Permission denied...`
-- **Solution**: This typically happens when not using a virtual environment. Activate a virtual environment before installing. If you must install globally, use the `--user` flag: `pip install --user odyn`.
+Follow these steps if you wish to contribute to Odyn, run tests, or modify the source code.
 
-**Network Issues**
-- **Error**: `ERROR: Could not find a version that satisfies the requirement odyn...`
-- **Solution**: Check your internet connection and firewall settings. Ensure you can reach PyPI by running `pip install odyn -i https://pypi.org/simple/`.
+### Step 1: Clone the Repository
+
+First, get a local copy of the source code.
+
+```bash
+git clone https://github.com/konspec/odyn.git
+cd odyn
+```
+
+### Step 2: Create Environment and Install Dependencies
+
+This process installs the library in "editable" mode along with all development tools.
+
+#### Recommended: Using `uv`
+```bash
+# Create and activate a virtual environment
+uv venv
+source .venv/bin/activate # On macOS/Linux, use .venv\Scripts\activate on Windows
+
+# Install in editable mode with development dependencies
+uv pip install -e ".[dev]"
+```
+
+#### Understanding the Command (`uv pip install -e ".[dev]"`)
+- `-e` or `--editable`: This flag is crucial. It installs the package in a way that your changes to the source code in `src/odyn/` are immediately effective without needing to reinstall the package.
+- `".[dev]"`: This tells the installer to:
+    - Look for the project in the current directory (`.`).
+    - Install the extra dependency group named `[dev]`, defined in `pyproject.toml`. This group includes linters, formatters, and testing tools like `ruff` and `pytest`.
+    - **Note**: The quotes are important on some systems (like macOS with Zsh) to prevent the shell from interpreting the square brackets.
+
+### Step 3: Run Quality and Test Suites
+
+After installation, verify that the development environment is set up correctly by running the project's quality checks and test suite.
+
+```bash
+# Run the linter to check for code style and quality
+ruff check .
+
+# Run the automated test suite
+pytest
+```
+Both commands should complete successfully on a fresh clone.
+
+---
+
+## Troubleshooting Guide
+
+### Issue: Command Not Found (`python3`, `uv`, `git`)
+- **Error**: `command not found: python3` or `command not found: uv`.
+- **Solution**: The command is either not installed or not available in your system's `PATH`.
+    - For Python, download it from [python.org](https://www.python.org/).
+    - For `uv`, install it via `pip install uv`.
+    - For `git`, install it from [git-scm.com](https://git-scm.com/).
+
+### Issue: Permission Denied
+- **Error**: `OSError: [Errno 13] Permission denied`.
+- **Solution**: This error occurs when you try to install packages to a system-level directory without sufficient permissions. **Always use a virtual environment to avoid this issue.** It's the correct and safest way to manage project dependencies.
+
+### Issue: `zsh: no matches found: .[dev]`
+- **Error**: Occurs on macOS or Linux systems using Zsh.
+- **Solution**: Your shell is trying to interpret the square brackets `[]` as a special pattern. To prevent this, wrap the argument in quotes:
+  ```bash
+  # Incorrect
+  pip install -e .[dev]
+
+  # Correct
+  pip install -e ".[dev]"
+  ```
+
+### Issue: Network Error
+- **Error**: `Could not find a version that satisfies the requirement odyn`.
+- **Solution**: This usually indicates a problem connecting to the Python Package Index (PyPI). Check your internet connection, VPN, or corporate firewall settings that might be blocking access to `pypi.org`.
 
 ## Next Steps
 
