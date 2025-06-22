@@ -9,7 +9,7 @@
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-black?logo=github)](https://github.com/konspec/odyn)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](docs/index.md)
+[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://konspec.github.io/odyn/)
 [![Tests](https://github.com/konspec/odyn/workflows/CI/badge.svg)](https://github.com/konspec/odyn/actions)
 [![codecov](https://codecov.io/gh/konspec/odyn/graph/badge.svg?token=H8MK6DP96P)](https://codecov.io/gh/konspec/odyn)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
@@ -36,7 +36,7 @@ Odyn provides a convenient and feature-rich interface for interacting with Micro
 pip install odyn
 ```
 
-Or see [full installation instructions](docs/installation.md) for pip, uv, and poetry.
+Or see [full installation instructions](https://konspec.github.io/odyn/installation/) for pip, uv, and poetry.
 
 ## Quick Start
 
@@ -75,24 +75,24 @@ filtered_customers = client.get(
 
 ## Documentation
 
-- 📚 **Full documentation:** [docs/index.md](docs/index.md)
+- 📚 **Full documentation:** [https://konspec.github.io/odyn/](https://konspec.github.io/odyn/)
 
 ### Getting Started
-- [Installation](docs/installation.md) - Install Odyn using pip, uv, or poetry
-- [Getting Started](docs/getting-started.md) - Quick setup and first API call
+- [Installation](https://konspec.github.io/odyn/installation/) - Install Odyn using pip, uv, or poetry
+- [Getting Started](https://konspec.github.io/odyn/getting-started/) - Quick setup and first API call
 
 ### Usage Guides
-- [Odyn Client](docs/usage/odyn.md) - Complete API reference for the main client
-- [Authentication Sessions](docs/usage/sessions.md) - Session management and authentication
-- [Exception Handling](docs/usage/exceptions.md) - Understanding and handling errors
+- [Odyn Client](https://konspec.github.io/odyn/usage/odyn/) - Complete API reference for the main client
+- [Authentication Sessions](https://konspec.github.io/odyn/usage/sessions/) - Session management and authentication
+- [Exception Handling](https://konspec.github.io/odyn/usage/exceptions/) - Understanding and handling errors
 
 ### Advanced Topics
-- [Configuration](docs/advanced/configuration.md) - Timeouts, retries, and advanced settings
-- [Logging](docs/advanced/logging.md) - Logging behavior and customization
+- [Configuration](https://konspec.github.io/odyn/advanced/configuration/) - Timeouts, retries, and advanced settings
+- [Logging](https://konspec.github.io/odyn/advanced/logging/) - Logging behavior and customization
 
 ### Reference
-- [FAQ](docs/faq.md) - Frequently asked questions
-- [Troubleshooting](docs/troubleshooting.md) - Common issues and solutions
+- [FAQ](https://konspec.github.io/odyn/faq/) - Frequently asked questions
+- [Troubleshooting](https://konspec.github.io/odyn/troubleshooting/) - Common issues and solutions
 
 ## Examples
 
