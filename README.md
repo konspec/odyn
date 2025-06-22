@@ -6,6 +6,7 @@
 
 **A modern, typed, and robust Python client for the Microsoft Dynamics 365 Business Central OData V4 API**
 
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-black?logo=github)](https://github.com/konspec/odyn)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](docs/index.md)
@@ -14,7 +15,6 @@
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 
 [![PyPI version](https://badge.fury.io/py/odyn.svg)](https://badge.fury.io/py/odyn)
-[![PyPI downloads](https://img.shields.io/pypi/dm/odyn.svg)](https://pypi.org/project/odyn/)
 
 ---
 
