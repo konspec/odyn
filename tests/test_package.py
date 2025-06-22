@@ -1,4 +1,3 @@
-# tests/test_package.py
 import pytest
 
 
