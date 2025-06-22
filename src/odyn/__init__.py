@@ -7,16 +7,26 @@ pluggable authentication sessions.
 
 from ._client import Odyn
 from ._exceptions import (
+    InvalidBackoffFactorError,
     InvalidLoggerError,
+    InvalidRetryError,
     InvalidSessionError,
+    InvalidStatusForcelistError,
     InvalidTimeoutError,
     InvalidURLError,
 )
+from .sessions import BasicAuthSession, BearerAuthSession, OdynSession
 
 __all__: list[str] = [
+    "BasicAuthSession",
+    "BearerAuthSession",
+    "InvalidBackoffFactorError",
     "InvalidLoggerError",
+    "InvalidRetryError",
     "InvalidSessionError",
+    "InvalidStatusForcelistError",
     "InvalidTimeoutError",
     "InvalidURLError",
     "Odyn",
+    "OdynSession",
 ]
