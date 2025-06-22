@@ -243,3 +243,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [OData V4 Specification](https://docs.oasis-open.org/odata/odata/v4.0/os/part1-protocol/odata-v4.0-os-part1-protocol.html)
 - [requests](https://docs.python-requests.org/) - HTTP library
 - [loguru](https://loguru.readthedocs.io/) - Logging library
+
+---
+[Konkan Speciality Polyproducts Pvt Ltd.](https://www.konspec.com)
