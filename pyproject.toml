@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "odyn"
-version = "1.0.2"
+version = "1.0.3"
 description = "Odyn – Python adapter for Microsoft Dynamics 365 Business Central OData v4 API"
 readme = "README.md"
 authors = [{name = "kon-fin", email = "erpsupport@konspec.com"}]

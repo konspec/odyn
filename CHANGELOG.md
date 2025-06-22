@@ -1,3 +1,9 @@
+## v1.0.3 (2025-06-22)
+
+### Fix
+
+- Fix mkdocs deployment to gh pages
+
 ## v1.0.2 (2025-06-22)
 
 ### Refactor
