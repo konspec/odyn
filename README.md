@@ -10,7 +10,7 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](docs/index.md)
 [![Tests](https://github.com/konspec/odyn/workflows/CI/badge.svg)](https://github.com/konspec/odyn/actions)
-[![codecov](https://codecov.io/gh/konspec/odyn/graph/badge.svg?token=H8MK6DP96P)](https://codecov.io/gh/konspec/odyn)[![codecov](https://codecov.io/gh/konspec/odyn/graph/badge.svg?token=H8MK6DP96P)](https://codecov.io/gh/konspec/odyn)
+[![codecov](https://codecov.io/gh/konspec/odyn/graph/badge.svg?token=H8MK6DP96P)](https://codecov.io/gh/konspec/odyn)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 
 ---
