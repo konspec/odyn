@@ -16,6 +16,11 @@ dependencies = [
     "mkdocs-material>=9.5.29",
 ]
 
+[project.urls]
+Homepage = "https://github.com/konspec/odyn"
+Documentation = "https://konspec.github.io/odyn/"
+Repository = "https://github.com/konspec/odyn"
+
 [project.scripts]
 odyn = "odyn:main"
 
