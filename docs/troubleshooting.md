@@ -1,158 +1,138 @@
-# Troubleshooting
+# Troubleshooting Guide
 
-This guide covers common errors and misconfigurations when using Odyn with Microsoft Dynamics 365 Business Central OData V4 API.
-
----
-
-## Table of Contents
-- [Invalid URL](#invalid-url)
-- [Incorrect Authentication](#incorrect-authentication)
-- [Timeout Misconfiguration](#timeout-misconfiguration)
-- [JSONDecodeError](#jsondecodeerror)
-- [Pagination Failures](#pagination-failures)
-- [Other Common Issues](#other-common-issues)
+This guide will help you diagnose and resolve common errors when using the Odyn client. For a list of all custom exceptions, see the [Exception Reference](usage/exceptions.md).
 
 ---
 
-## Invalid URL
+A good first step for any issue is to [enable detailed logging](#1-enable-logging), which can provide crucial context about the problem.
 
-**Symptoms:**
-- `InvalidURLError` raised
-- Stack trace: `InvalidURLError: URL cannot be empty` or `URL must have a valid scheme (http or https)`
+## 1. Configuration Errors
 
-**Root Causes:**
-- Base URL is empty, missing, or has wrong scheme
-- Typo in the URL
+These errors are raised by Odyn's internal validation before a network request is made. They indicate a problem with how the client was initialized.
 
-**Solution:**
-- Ensure the base URL is a non-empty string, starts with `https://`, and includes a valid domain.
-- Example:
-  ```python
-  client = Odyn(base_url="https://your-tenant.businesscentral.dynamics.com/api/v2.0/", session=session)
-  ```
+### InvalidURLError
+- **Symptom**: `InvalidURLError: URL must have a valid scheme (http or https)...` or `URL cannot be empty`.
+- **Cause**: The `base_url` is missing, malformed, or does not start with `http://` or `https://`.
+- **Solution**: Provide a valid, non-empty base URL.
 
----
+```python
+# Correct
+client = Odyn(base_url="https://api.example.com/api/v2.0/", ...)
+```
 
-## Incorrect Authentication
+### InvalidSessionError
+- **Symptom**: `InvalidSessionError: session must be a Session, got <class 'str'>`.
+- **Cause**: The object passed to the `session` parameter is not an instance of `requests.Session`.
+- **Solution**: Pass a valid session object, such as `BearerAuthSession` or `BasicAuthSession`.
 
-**Symptoms:**
-- HTTP 401 Unauthorized
-- Stack trace: `requests.exceptions.HTTPError: 401 Client Error: Unauthorized`
+```python
+from odyn import BearerAuthSession
 
-**Root Causes:**
-- Invalid or expired access token
-- Wrong username/password
-- Missing authentication header
+# Correct
+session = BearerAuthSession("your-token")
+client = Odyn(..., session=session)
+```
 
-**Solution:**
-- Use a valid `BearerAuthSession` or `BasicAuthSession`.
-- Refresh your access token if expired.
-- Example:
-  ```python
-  session = BearerAuthSession("your-access-token")
-  client = Odyn(base_url=..., session=session)
-  ```
+### InvalidTimeoutError
+- **Symptom**: `InvalidTimeoutError: Timeout must be a tuple...` or `...must be greater than 0`.
+- **Cause**: The `timeout` parameter was not a tuple of two positive numbers.
+- **Solution**: Ensure the timeout is in the format `(connect_timeout, read_timeout)`.
 
----
+```python
+# Correct
+client = Odyn(..., timeout=(10, 60))
+```
 
-## Timeout Misconfiguration
-
-**Symptoms:**
-- `InvalidTimeoutError` raised
-- Stack trace: `InvalidTimeoutError: Timeout must be a tuple, got int` or `Timeout values must be greater than 0, got 0`
-- `requests.exceptions.Timeout`
-
-**Root Causes:**
-- Timeout is not a tuple of two positive numbers
-- Network is slow or unresponsive
-
-**Solution:**
-- Use a tuple for timeout: `(connect_timeout, read_timeout)`
-- Increase timeout values for slow networks
-- Example:
-  ```python
-  client = Odyn(base_url=..., session=session, timeout=(30, 120))
-  ```
+### InvalidLoggerError
+- **Symptom**: `InvalidLoggerError: logger must be a Logger, got ...`
+- **Cause**: The object passed to the `logger` parameter is not a `loguru.Logger` instance.
+- **Solution**: Provide a valid `loguru` logger.
 
 ---
 
-## JSONDecodeError
+## 2. HTTP & Network Errors
 
-**Symptoms:**
-- `ValueError: Failed to decode JSON from response`
-- Stack trace: `requests.exceptions.JSONDecodeError`
+These errors occur during the network request and are typically raised by the underlying `requests` library.
 
-**Root Causes:**
-- API returned non-JSON response (e.g., HTML error page)
-- Network issues or server errors
+### 401 Unauthorized
+- **Symptom**: `requests.exceptions.HTTPError: 401 Client Error: Unauthorized for url: ...`
+- **Cause**: The access token is invalid, expired, or lacks the required permissions.
+- **Solution**:
+    1.  Ensure your access token is correct and not expired.
+    2.  Verify the associated application has the correct API permissions in Business Central.
 
-**Solution:**
-- Check the response content (log it if needed)
-- Ensure the endpoint is correct and the server is healthy
-- Example:
-  ```python
-  try:
-      data = client.get("customers")
-  except ValueError as e:
-      print(f"JSON error: {e}")
-  ```
+### 429 Too Many Requests
+- **Symptom**: `requests.exceptions.HTTPError: 429 Client Error: Too Many Requests for url: ...`
+- **Cause**: The Business Central API is rate-limiting your client due to too many requests in a short period.
+- **Solution**: Adjust the retry settings on your session to use a higher `backoff_factor` or more `retries`.
 
----
+```python
+# Increase backoff to wait longer between retries
+session = BearerAuthSession(..., backoff_factor=3.0, retries=10)
+```
+**See**: [Advanced Configuration](advanced/configuration.md)
 
-## Pagination Failures
+### Request Timeouts
+- **Symptom**: `requests.exceptions.ConnectTimeout` or `requests.exceptions.ReadTimeout`.
+- **Cause**: The request took longer than the configured `timeout` values. This is distinct from `InvalidTimeoutError`.
+- **Solution**: Increase the `connect` or `read` timeout values in the client configuration.
 
-**Symptoms:**
-- `TypeError: OData response missing 'value' list.`
-- Stack trace: `TypeError: OData response format is invalid: 'value' key is missing or not a list.`
+```python
+# Increase read timeout to 5 minutes for a long-running query
+client = Odyn(..., timeout=(15, 300))
+```
 
-**Root Causes:**
-- API endpoint does not return OData-compliant response
-- Incorrect endpoint or query
-
-**Solution:**
-- Check the endpoint and query parameters
-- Ensure the API returns a JSON object with a `value` key containing a list
-- Example expected response:
-  ```json
-  {
-    "@odata.context": "...",
-    "value": [ ... ]
-  }
-  ```
+### Connection & SSL Errors
+- **Symptom**: `requests.exceptions.ConnectionError` or `requests.exceptions.SSLError`.
+- **Cause**: A network problem (e.g., DNS, firewall, proxy) or an SSL certificate issue is preventing a connection.
+- **Solution**: Check your network environment and ensure your system's root certificates are up to date.
 
 ---
 
-## Other Common Issues
+## 3. API Response Errors
 
-### SSL Errors
-- **Symptoms:** `requests.exceptions.SSLError`
-- **Solution:** Ensure your system trusts the server's SSL certificate. Use `verify=False` only for testing.
+These errors indicate that the client received a response from the API, but the data was not in the expected format.
 
-### Network Errors
-- **Symptoms:** `requests.exceptions.ConnectionError`, `requests.exceptions.Timeout`
-- **Solution:** Check your internet connection and firewall settings.
+### JSON Decode Error
+- **Symptom**: `ValueError: Failed to decode JSON from response`.
+- **Cause**: The API returned a non-JSON response, which can happen if there is a server-side error that produces an HTML error page.
+- **Solution**: Enable logging to inspect the raw response body. The endpoint you are calling may be incorrect or the server may be down.
 
-### Rate Limiting
-- **Symptoms:** HTTP 429 Too Many Requests
-- **Solution:** Increase backoff factor and retries. See [Advanced Configuration](advanced/configuration.md).
+### Invalid OData Response
+- **Symptom**: `TypeError: OData response format is invalid: 'value' key is missing...`
+- **Cause**: The API response, while valid JSON, does not follow the expected OData structure (i.e., it's missing the `value` key for a collection).
+- **Solution**:
+    1.  Confirm your endpoint URL is correct.
+    2.  Ensure you are querying a collection endpoint (e.g., `/customers`) and not a single entity endpoint (e.g., `/customers(some_id)`).
 
 ---
 
-## Debugging Tips
+## General Debugging Strategy
 
-- Enable debug logging with loguru to see request/response details:
-  ```python
-  from loguru import logger
-  logger.add("odyn_debug.log", level="DEBUG")
-  ```
-- Print or inspect the full stack trace for errors.
-- Use [Exception Handling](usage/exceptions.md) to catch and resolve specific errors.
-- Review [FAQ](faq.md) for more help.
+If you're not sure what the problem is, follow these steps:
+
+### 1. Enable Logging
+The most effective way to debug is to enable detailed logging. This will show you the exact requests being made, the responses received, and any validation warnings.
+```python
+import sys
+from loguru import logger
+
+# Send detailed logs to a file and INFO-level logs to the console
+logger.add("debug.log", level="DEBUG")
+logger.add(sys.stderr, level="INFO")
+
+# Pass the logger to the client
+client = Odyn(..., logger=logger)
+```
+**See**: [Logging Guide](advanced/logging.md)
+
+### 2. Inspect the Exception
+Examine the full traceback to understand where the error originated. An error from `odyn._exceptions` is a client-side validation issue, while an error from `requests.exceptions` is a network or HTTP issue.
+
+### 3. Check the API Documentation
+Consult the [Business Central API Docs](https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/api-reference/v2.0/) to ensure your endpoints and parameters are correct.
 
 ---
 
 ## Still Stuck?
-- Review the [FAQ](faq.md)
-- Check the [Exception Reference](usage/exceptions.md)
-- File an issue or ask for help via [Contributing](contributing.md)
-- Consult the [Microsoft OData V4 Docs](https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/api-reference/v2.0/)
+If you're still having trouble, please [open an issue](https://github.com/kon-fin/odyn/issues) and provide as much detail as possible, including logs and code to reproduce the problem.
