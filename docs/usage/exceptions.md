@@ -1,484 +1,207 @@
-# Exception Handling
+# Guide to Exception Handling
 
-Odyn provides comprehensive exception handling with custom exception types for different error scenarios. All exceptions inherit from the base `OdynError` class, making them easy to catch and handle appropriately.
+Effective error handling is critical for building robust applications. This guide provides a comprehensive overview of the exceptions that Odyn can raise and the best practices for handling them.
 
-## Exception Hierarchy
+## Two Categories of Exceptions
+
+It is helpful to think of errors in two main categories:
+
+1.  **Configuration Errors (`OdynError` and its subclasses)**
+    These exceptions occur when you try to initialize an `Odyn` client or `Session` with invalid parameters. They are predictable and indicate a problem in your code that should be fixed during development. All of these inherit from the base `OdynError`.
+
+2.  **Runtime & Network Errors (`requests.exceptions`)**
+    These exceptions occur during a live API call. They are raised by the underlying `requests` library and indicate issues like network failures, timeouts, or HTTP error responses from the server (e.g., `401 Unauthorized`). These are the errors you need to handle gracefully in your production code.
+
+---
+
+## Configuration Errors: The `OdynError` Hierarchy
+
+All custom exceptions raised by Odyn inherit from a single base class, `OdynError`. This allows you to catch any specific configuration error, or all of them at once by catching the base class.
 
 ```
-OdynError (base exception)
+OdynError
 ├── InvalidURLError
 ├── InvalidSessionError
-├── InvalidLoggerError
 ├── InvalidTimeoutError
+├── InvalidLoggerError
 ├── InvalidRetryError
 ├── InvalidBackoffFactorError
 └── InvalidStatusForcelistError
 ```
 
-## Exception Reference Table
+### `InvalidURLError`
+Raised when initializing an `Odyn` client with a malformed `base_url`.
 
-| Exception | Raised When | Suggested Fix |
-|-----------|-------------|---------------|
-| `InvalidURLError` | URL is empty, invalid, or has wrong scheme | Provide a valid HTTPS URL |
-| `InvalidSessionError` | Session is not a `requests.Session` object | Use proper session classes |
-| `InvalidLoggerError` | Logger is not a loguru `Logger` object | Use loguru logger or pass `None` |
-| `InvalidTimeoutError` | Timeout is not a tuple of two positive numbers | Use `(connect_timeout, read_timeout)` format |
-| `InvalidRetryError` | Retries parameter is not a positive integer | Use positive integer values |
-| `InvalidBackoffFactorError` | Backoff factor is not a positive number | Use positive float/int values |
-| `InvalidStatusForcelistError` | Status forcelist is not a list of integers | Use list of HTTP status codes |
+-   **Common Causes**: The URL string is empty, does not start with `http://` or `https://`, or is otherwise invalid.
+-   **Example Trigger**:
+    ```python
+    import requests
+    from odyn import Odyn, InvalidURLError
+    try:
+        # This will fail because the scheme is missing
+        client = Odyn(base_url="api.example.com", session=requests.Session())
+    except InvalidURLError as e:
+        print(f"Caught expected error: {e}")
+    ```
 
-## Detailed Exception Descriptions
+### `InvalidSessionError`
+Raised when initializing an `Odyn` client with an object that is not an instance of `requests.Session`.
 
-### OdynError
+-   **Common Causes**: Passing `None` or a non-session object (like a string or dict) to the `session` parameter.
+-   **Example Trigger**:
+    ```python
+    from odyn import Odyn, InvalidSessionError
+    try:
+        # This will fail because a string is not a session object
+        client = Odyn(base_url="https://api.example.com", session="not-a-session")
+    except InvalidSessionError as e:
+        print(f"Caught expected error: {e}")
+    ```
 
-Base exception class for all Odyn-specific exceptions.
+### `InvalidTimeoutError`
+Raised when initializing an `Odyn` client with a malformed `timeout`.
+
+-   **Common Causes**: Providing a single number instead of a tuple, a tuple with the wrong number of elements, or a tuple containing non-positive values.
+-   **Example Trigger**:
+    ```python
+    import requests
+    from odyn import Odyn, InvalidTimeoutError
+    try:
+        # This will fail because the timeout must be a tuple of two positive numbers
+        client = Odyn(base_url="https://api.example.com/", session=requests.Session(), timeout=(10, -30))
+    except InvalidTimeoutError as e:
+        print(f"Caught expected error: {e}")
+    ```
+
+### `InvalidLoggerError`
+Raised when initializing an `Odyn` client with an object that is not a `loguru.Logger`.
+
+-   **Common Causes**: Passing a logger from Python's standard `logging` library or any other non-loguru object.
+-   **Example Trigger**:
+    ```python
+    import logging
+    import requests
+    from odyn import Odyn, InvalidLoggerError
+    try:
+        # This will fail because it's not a loguru logger
+        std_logger = logging.getLogger("test")
+        client = Odyn(base_url="https://api.example.com/", session=requests.Session(), logger=std_logger)
+    except InvalidLoggerError as e:
+        print(f"Caught expected error: {e}")
+    ```
+
+### `InvalidRetryError`
+Raised when initializing an `OdynSession` (or its subclasses) with an invalid `retries` value.
+
+-   **Common Causes**: Providing a zero, negative, or non-integer value for the retry count.
+-   **Example Trigger**:
+    ```python
+    from odyn import BearerAuthSession, InvalidRetryError
+    try:
+        # This will fail because retries must be a positive integer
+        session = BearerAuthSession(token="some-token", retries=0)
+    except InvalidRetryError as e:
+        print(f"Caught expected error: {e}")
+    ```
+
+### `InvalidBackoffFactorError`
+Raised when initializing an `OdynSession` with an invalid `backoff_factor`.
+
+-   **Common Causes**: Providing a zero or negative number for the backoff factor.
+-   **Example Trigger**:
+    ```python
+    from odyn import BearerAuthSession, InvalidBackoffFactorError
+    try:
+        # This will fail because the backoff factor must be positive
+        session = BearerAuthSession(token="some-token", backoff_factor=-1.0)
+    except InvalidBackoffFactorError as e:
+        print(f"Caught expected error: {e}")
+    ```
+
+### `InvalidStatusForcelistError`
+Raised when initializing an `OdynSession` with a `status_forcelist` that is not a list of integers.
+
+-   **Common Causes**: Providing a string or a list containing non-integer values.
+-   **Example Trigger**:
+    ```python
+    from odyn import BearerAuthSession, InvalidStatusForcelistError
+    try:
+        # This will fail because the list contains a string
+        session = BearerAuthSession(token="some-token", status_forcelist=[500, "429"])
+    except InvalidStatusForcelistError as e:
+        print(f"Caught expected error: {e}")
+    ```
+
+---
+
+## Runtime & Network Errors
+
+These errors occur during the `client.get()` call and must be handled in your code.
+
+### `requests.exceptions.HTTPError`
+-   **When it's raised**: When the Business Central API returns an HTTP error code (4xx or 5xx) that is **not** in the session's `status_forcelist` (and therefore not retried).
+-   **Common Causes**:
+    -   `401 Unauthorized`: Your token is invalid, expired, or lacks permissions.
+    -   `404 Not Found`: The `base_url` or `endpoint` is incorrect.
+    -   `400 Bad Request`: Your OData query (e.g., in `$filter`) is malformed.
+-   **Handling**: You can inspect the `response` attribute on the exception to get the status code and the error message from the API.
+
+### `requests.exceptions.RequestException`
+-   **When it's raised**: For fundamental networking issues.
+-   **Common Causes**: DNS failures, connection refused, or timeouts (both connect and read).
+-   **Handling**: This is a base class for many `requests` exceptions. Catching it is a good way to handle most network-level problems.
+
+---
+
+## Best Practice: Error Handling Strategy
+
+Here is a robust `try...except` block that demonstrates how to handle these exceptions in a structured way. The key is to catch more specific exceptions before more general ones.
 
 ```python
-class OdynError(Exception):
-    """Base exception for all Odyn exceptions."""
-```
-
-### InvalidURLError
-
-Raised when an invalid URL is provided to the Odyn client.
-
-**Common Causes:**
-- Empty or whitespace-only URL
-- Missing HTTP/HTTPS scheme
-- Invalid URL format
-- Missing domain
-
-**Example:**
-```python
-from odyn import Odyn, InvalidURLError
 import requests
+from odyn import Odyn, BearerAuthSession, OdynError
 
-try:
-    client = Odyn(
-        base_url="",  # Empty URL
-        session=requests.Session()
-    )
-except InvalidURLError as e:
-    print(f"URL Error: {e}")  # "URL cannot be empty"
-
-try:
-    client = Odyn(
-        base_url="ftp://invalid.scheme",  # Invalid scheme
-        session=requests.Session()
-    )
-except InvalidURLError as e:
-    print(f"URL Error: {e}")  # "URL must have a valid scheme (http or https)"
-```
-
-**Fix:**
-```python
-# ✅ Correct
+# Assume client is configured correctly for this example.
+# In a real app, these would come from a secure config or environment variables.
+session = BearerAuthSession(token="your-token")
 client = Odyn(
-    base_url="https://your-tenant.businesscentral.dynamics.com/api/v2.0/",
-    session=requests.Session()
-)
-```
-
-### InvalidSessionError
-
-Raised when an invalid session object is provided.
-
-**Common Causes:**
-- Passing `None` instead of a session
-- Passing a string or other object instead of `requests.Session`
-- Using an uninitialized session object
-
-**Example:**
-```python
-from odyn import Odyn, InvalidSessionError
-
-try:
-    client = Odyn(
-        base_url="https://api.example.com/",
-        session=None  # Invalid session
-    )
-except InvalidSessionError as e:
-    print(f"Session Error: {e}")  # "session must be a Session, got NoneType"
-
-try:
-    client = Odyn(
-        base_url="https://api.example.com/",
-        session="not a session"  # Invalid session
-    )
-except InvalidSessionError as e:
-    print(f"Session Error: {e}")  # "session must be a Session, got str"
-```
-
-**Fix:**
-```python
-from odyn import BearerAuthSession
-
-# ✅ Correct
-session = BearerAuthSession("your-token")
-client = Odyn(
-    base_url="https://api.example.com/",
+    base_url="https://api.businesscentral.dynamics.com/v2.0/your-tenant/production/",
     session=session
 )
-```
-
-### InvalidLoggerError
-
-Raised when an invalid logger object is provided.
-
-**Common Causes:**
-- Passing a non-loguru logger object
-- Passing an incompatible logging library
-
-**Example:**
-```python
-from odyn import Odyn, InvalidLoggerError
-import logging
 
 try:
-    # Using standard logging instead of loguru
-    std_logger = logging.getLogger("my_app")
-    client = Odyn(
-        base_url="https://api.example.com/",
-        session=requests.Session(),
-        logger=std_logger  # Invalid logger type
+    # This is the operation that can fail at runtime
+    customers = client.get(
+        "customers",
+        params={"$filter": "city eq 'New York'"}
     )
-except InvalidLoggerError as e:
-    print(f"Logger Error: {e}")  # "logger must be a Logger, got Logger"
-```
+    print(f"Successfully retrieved {len(customers)} customers.")
 
-**Fix:**
-```python
-from loguru import logger
+except requests.exceptions.HTTPError as http_err:
+    # Handle specific HTTP status codes from the API
+    status_code = http_err.response.status_code
+    response_text = http_err.response.text
+    print(f"HTTP Error: {status_code}. The API responded with: {response_text}")
+    if status_code == 401:
+        print("Authentication failed. Please check your access token.")
+    elif status_code == 404:
+        print("The requested resource was not found. Please check your URL and endpoint.")
 
-# ✅ Correct
-custom_logger = logger.bind(component="odyn-client")
-client = Odyn(
-    base_url="https://api.example.com/",
-    session=session,
-    logger=custom_logger
-)
+except requests.exceptions.RequestException as req_err:
+    # Handle network-level errors (timeouts, connection issues)
+    print(f"Network Error: Could not complete the request. {req_err}")
 
-# Or use default logger
-client = Odyn(
-    base_url="https://api.example.com/",
-    session=session,
-    logger=None  # Uses default loguru logger
-)
-```
+except (TypeError, ValueError) as data_err:
+    # Handle cases where the API returns unexpected or malformed JSON
+    print(f"Data Error: The API response was not in the expected format. {data_err}")
 
-### InvalidTimeoutError
+except OdynError as config_err:
+    # This is for catching configuration errors during development.
+    # In production, this block might be less critical if config is static.
+    print(f"Configuration Error: The Odyn client or session is misconfigured. {config_err}")
 
-Raised when an invalid timeout configuration is provided.
-
-**Common Causes:**
-- Passing a single number instead of a tuple
-- Using negative or zero values
-- Using wrong data types
-
-**Example:**
-```python
-from odyn import Odyn, InvalidTimeoutError
-
-try:
-    client = Odyn(
-        base_url="https://api.example.com/",
-        session=requests.Session(),
-        timeout=30  # Single number instead of tuple
-    )
-except InvalidTimeoutError as e:
-    print(f"Timeout Error: {e}")  # "Timeout must be a tuple, got int"
-
-try:
-    client = Odyn(
-        base_url="https://api.example.com/",
-        session=requests.Session(),
-        timeout=(30,)  # Single-element tuple
-    )
-except InvalidTimeoutError as e:
-    print(f"Timeout Error: {e}")  # "Timeout must be a tuple of length 2, got length 1"
-
-try:
-    client = Odyn(
-        base_url="https://api.example.com/",
-        session=requests.Session(),
-        timeout=(-10, 30)  # Negative value
-    )
-except InvalidTimeoutError as e:
-    print(f"Timeout Error: {e}")  # "Timeout values must be greater than 0, got -10"
-```
-
-**Fix:**
-```python
-# ✅ Correct
-client = Odyn(
-    base_url="https://api.example.com/",
-    session=requests.Session(),
-    timeout=(30, 60)  # (connect_timeout, read_timeout)
-)
-```
-
-### InvalidRetryError
-
-Raised when an invalid retry configuration is provided to session classes.
-
-**Common Causes:**
-- Using zero or negative retry values
-- Using non-integer values
-
-**Example:**
-```python
-from odyn import OdynSession, InvalidRetryError
-
-try:
-    session = OdynSession(retries=0)  # Zero retries
-except InvalidRetryError as e:
-    print(f"Retry Error: {e}")  # "Retries must be a positive integer."
-
-try:
-    session = OdynSession(retries=-1)  # Negative retries
-except InvalidRetryError as e:
-    print(f"Retry Error: {e}")  # "Retries must be a positive integer."
-```
-
-**Fix:**
-```python
-# ✅ Correct
-session = OdynSession(retries=5)  # Positive integer
-```
-
-### InvalidBackoffFactorError
-
-Raised when an invalid backoff factor is provided to session classes.
-
-**Common Causes:**
-- Using zero or negative backoff factors
-- Using non-numeric values
-
-**Example:**
-```python
-from odyn import OdynSession, InvalidBackoffFactorError
-
-try:
-    session = OdynSession(backoff_factor=0)  # Zero backoff
-except InvalidBackoffFactorError as e:
-    print(f"Backoff Error: {e}")  # "Backoff factor must be a positive number."
-
-try:
-    session = OdynSession(backoff_factor=-1.5)  # Negative backoff
-except InvalidBackoffFactorError as e:
-    print(f"Backoff Error: {e}")  # "Backoff factor must be a positive number."
-```
-
-**Fix:**
-```python
-# ✅ Correct
-session = OdynSession(backoff_factor=2.0)  # Positive number
-```
-
-### InvalidStatusForcelistError
-
-Raised when an invalid status forcelist is provided to session classes.
-
-**Common Causes:**
-- Using non-list values
-- Including non-integer values in the list
-
-**Example:**
-```python
-from odyn import OdynSession, InvalidStatusForcelistError
-
-try:
-    session = OdynSession(status_forcelist=[500, "429"])  # String in list
-except InvalidStatusForcelistError as e:
-    print(f"Status Forcelist Error: {e}")  # "Status forcelist must be a list of integers."
-
-try:
-    session = OdynSession(status_forcelist="500,429")  # String instead of list
-except InvalidStatusForcelistError as e:
-    print(f"Status Forcelist Error: {e}")  # "Status forcelist must be a list of integers."
-```
-
-**Fix:**
-```python
-# ✅ Correct
-session = OdynSession(status_forcelist=[429, 500, 502, 503, 504])
-```
-
-## Comprehensive Error Handling
-
-Here's a complete example showing how to handle all Odyn exceptions:
-
-```python
-from odyn import (
-    Odyn, BearerAuthSession,
-    InvalidURLError, InvalidSessionError, InvalidLoggerError, InvalidTimeoutError,
-    InvalidRetryError, InvalidBackoffFactorError, InvalidStatusForcelistError
-)
-import requests
-from loguru import logger
-
-def create_odyn_client_safely():
-    """Create an Odyn client with comprehensive error handling."""
-
-    try:
-        # Create session with error handling
-        try:
-            session = BearerAuthSession(
-                token="your-access-token",
-                retries=5,
-                backoff_factor=2.0,
-                status_forcelist=[429, 500, 502, 503, 504]
-            )
-        except (InvalidRetryError, InvalidBackoffFactorError, InvalidStatusForcelistError) as e:
-            logger.error(f"Session configuration error: {e}")
-            # Fall back to default settings
-            session = BearerAuthSession("your-access-token")
-
-        # Create client with error handling
-        try:
-            client = Odyn(
-                base_url="https://your-tenant.businesscentral.dynamics.com/api/v2.0/",
-                session=session,
-                logger=logger.bind(component="odyn-client"),
-                timeout=(30, 120)
-            )
-            return client
-
-        except InvalidURLError as e:
-            logger.error(f"Invalid URL: {e}")
-            raise
-        except InvalidSessionError as e:
-            logger.error(f"Invalid session: {e}")
-            raise
-        except InvalidLoggerError as e:
-            logger.error(f"Invalid logger: {e}")
-            # Fall back to default logger
-            client = Odyn(
-                base_url="https://your-tenant.businesscentral.dynamics.com/api/v2.0/",
-                session=session,
-                logger=None,  # Use default logger
-                timeout=(30, 120)
-            )
-            return client
-        except InvalidTimeoutError as e:
-            logger.error(f"Invalid timeout: {e}")
-            # Fall back to default timeout
-            client = Odyn(
-                base_url="https://your-tenant.businesscentral.dynamics.com/api/v2.0/",
-                session=session,
-                logger=logger.bind(component="odyn-client")
-                # Use default timeout
-            )
-            return client
-
-    except Exception as e:
-        logger.error(f"Unexpected error creating client: {e}")
-        raise
-
-def safe_api_call(client, endpoint, params=None):
-    """Make a safe API call with error handling."""
-
-    try:
-        return client.get(endpoint, params=params)
-
-    except requests.exceptions.HTTPError as e:
-        logger.error(f"HTTP Error {e.response.status_code}: {e.response.text}")
-        raise
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Network Error: {e}")
-        raise
-    except ValueError as e:
-        logger.error(f"JSON Decode Error: {e}")
-        raise
-    except TypeError as e:
-        logger.error(f"OData Response Error: {e}")
-        raise
-    except Exception as e:
-        logger.error(f"Unexpected Error: {e}")
-        raise
-
-# Usage
-if __name__ == "__main__":
-    try:
-        client = create_odyn_client_safely()
-        customers = safe_api_call(client, "customers")
-        print(f"Retrieved {len(customers)} customers")
-
-    except Exception as e:
-        print(f"Failed to retrieve customers: {e}")
-```
-
-## Best Practices
-
-### 1. Use Specific Exception Handling
-
-```python
-# ✅ Good - Handle specific exceptions
-try:
-    client = Odyn(base_url=url, session=session)
-except InvalidURLError as e:
-    print(f"URL problem: {e}")
-except InvalidSessionError as e:
-    print(f"Session problem: {e}")
-
-# ❌ Avoid - Catching all exceptions
-try:
-    client = Odyn(base_url=url, session=session)
 except Exception as e:
-    print(f"Something went wrong: {e}")
+    # A general fallback for any other unexpected errors
+    print(f"An unexpected error occurred: {e}")
+
 ```
-
-### 2. Provide Meaningful Error Messages
-
-```python
-def validate_config(config):
-    """Validate configuration with helpful error messages."""
-
-    if not config.get("base_url"):
-        raise InvalidURLError("base_url is required in configuration")
-
-    if not config.get("token"):
-        raise ValueError("access_token is required for authentication")
-
-    if config.get("timeout") and not isinstance(config["timeout"], tuple):
-        raise InvalidTimeoutError("timeout must be a tuple of (connect_timeout, read_timeout)")
-```
-
-### 3. Log Errors Appropriately
-
-```python
-from loguru import logger
-
-try:
-    client = Odyn(base_url=url, session=session)
-except InvalidURLError as e:
-    logger.error(f"Configuration error - invalid URL: {url}", error=str(e))
-    # Handle gracefully or re-raise
-except InvalidSessionError as e:
-    logger.error("Configuration error - invalid session", error=str(e))
-    # Handle gracefully or re-raise
-```
-
-### 4. Use Fallback Values
-
-```python
-def create_client_with_fallbacks(config):
-    """Create client with fallback values for invalid configuration."""
-
-    # Try custom timeout, fall back to default
-    try:
-        timeout = config.get("timeout", (60, 60))
-        client = Odyn(base_url=config["base_url"], session=session, timeout=timeout)
-    except InvalidTimeoutError:
-        logger.warning("Invalid timeout configuration, using defaults")
-        client = Odyn(base_url=config["base_url"], session=session)
-
-    return client
-```
-
-## Related Documentation
-
-- [Odyn Client API](odyn.md) - Understanding client initialization errors
-- [Authentication Sessions](sessions.md) - Session-related exceptions
-- [Troubleshooting](troubleshooting.md) - Common error scenarios and solutions
-- [Configuration](advanced/configuration.md) - Valid configuration options
