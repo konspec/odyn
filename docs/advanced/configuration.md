@@ -1,499 +1,192 @@
 # Advanced Configuration
 
-This guide covers advanced configuration options for Odyn, including timeout settings, retry logic, backoff strategies, and parameter validation.
+The `odyn` client is designed to be robust and flexible. This guide covers advanced configuration options for timeouts, retry strategies, and common setup patterns to help you tailor the client to your specific needs.
 
 ## Timeout Configuration
 
-Odyn uses a tuple-based timeout configuration that separates connection and read timeouts.
+Odyn allows you to set separate timeouts for connecting to the server and for reading the response. This is useful for handling network conditions and long-running queries independently.
 
-### Timeout Format
+The timeout is a tuple of two numbers (integers or floats): `(connect_timeout, read_timeout)`.
 
-```python
-TimeoutType = tuple[int, int] | tuple[float, float]
-timeout = (connect_timeout, read_timeout)
-```
+- **`connect_timeout`**: The time (in seconds) to wait for a connection to the server to be established.
+- **`read_timeout`**: The time (in seconds) to wait for the server to send a response after the connection is established.
 
-### Default Timeout
-
-```python
-DEFAULT_TIMEOUT = (60, 60)  # 60 seconds for both connect and read
-```
+By default, the timeout is `(60, 60)`.
 
 ### Timeout Examples
 
 ```python
 from odyn import Odyn, BearerAuthSession
 
-# Quick connections, long reads (good for large datasets)
+# Default timeout (60s connect, 60s read)
 client = Odyn(
     base_url="https://api.example.com/",
-    session=BearerAuthSession("token"),
-    timeout=(10, 300)  # 10s connect, 5min read
+    session=BearerAuthSession("your-token")
 )
 
-# Conservative timeouts (good for slow networks)
-client = Odyn(
+# Aggressive timeout for fast networks (5s connect, 30s read)
+fast_client = Odyn(
     base_url="https://api.example.com/",
-    session=BearerAuthSession("token"),
-    timeout=(120, 180)  # 2min connect, 3min read
+    session=BearerAuthSession("your-token"),
+    timeout=(5, 30)
 )
 
-# Aggressive timeouts (good for fast networks)
-client = Odyn(
+# Conservative timeout for large data exports (15s connect, 5min read)
+bulk_client = Odyn(
     base_url="https://api.example.com/",
-    session=BearerAuthSession("token"),
-    timeout=(5, 30)  # 5s connect, 30s read
+    session=BearerAuthSession("your-token"),
+    timeout=(15, 300)
 )
 ```
 
-### Timeout Recommendations
+## Retry and Backoff Strategy
 
-| Use Case | Connect Timeout | Read Timeout | Rationale |
-|----------|----------------|--------------|-----------|
-| **Development** | 10s | 60s | Fast feedback, moderate data |
-| **Production (stable)** | 30s | 120s | Reliable networks, large datasets |
-| **Production (unreliable)** | 60s | 300s | Slow networks, retry scenarios |
-| **Batch processing** | 30s | 600s | Large data transfers |
-| **Real-time applications** | 5s | 30s | Quick responses needed |
+The `OdynSession` and its subclasses (`BearerAuthSession`, `BasicAuthSession`) automatically retry failed requests using an exponential backoff strategy. This helps the client recover from transient network errors or temporary server issues.
 
-## Retry Logic and Exponential Backoff
+### Configuring Retries
 
-Odyn sessions include built-in retry logic with exponential backoff to handle transient failures.
-
-### Retry Configuration
+You can customize the retry behavior when creating a session instance.
 
 ```python
-from odyn import BearerAuthSession
+from odyn import Odyn, BearerAuthSession
 
-# Default retry settings
-session = BearerAuthSession("token")  # 5 retries, 2.0 backoff factor
-
-# Custom retry settings
+# Customize retry attempts, backoff factor, and status codes to retry on
 session = BearerAuthSession(
-    token="token",
-    retries=10,                    # Total retry attempts
-    backoff_factor=1.5,            # Backoff multiplier
-    status_forcelist=[429, 500, 502, 503, 504]  # Status codes to retry
-)
-```
-
-### Backoff Calculation
-
-The retry delay is calculated using exponential backoff:
-
-```
-delay = backoff_factor * (2 ** (retry_number - 1))
-```
-
-### Backoff Timing Examples
-
-| Backoff Factor | 1st Retry | 2nd Retry | 3rd Retry | 4th Retry | 5th Retry |
-|----------------|-----------|-----------|-----------|-----------|-----------|
-| **0.5** | 0.5s | 1.0s | 2.0s | 4.0s | 8.0s |
-| **1.0** | 1.0s | 2.0s | 4.0s | 8.0s | 16.0s |
-| **2.0** (default) | 2.0s | 4.0s | 8.0s | 16.0s | 32.0s |
-| **3.0** | 3.0s | 6.0s | 12.0s | 24.0s | 48.0s |
-
-### Status Code Forcelist
-
-The `status_forcelist` determines which HTTP status codes trigger retries:
-
-```python
-# Default status codes that trigger retries
-DEFAULT_STATUS_FORCELIST = [500, 502, 503, 504, 429]
-
-# Common status codes and their meanings
-STATUS_CODES = {
-    408: "Request Timeout",
-    429: "Too Many Requests (Rate Limited)",
-    500: "Internal Server Error",
-    502: "Bad Gateway",
-    503: "Service Unavailable",
-    504: "Gateway Timeout",
-    520: "Unknown Error (Cloudflare)",
-    521: "Web Server Down (Cloudflare)",
-    522: "Connection Timed Out (Cloudflare)",
-    523: "Origin Unreachable (Cloudflare)",
-    524: "A Timeout Occurred (Cloudflare)"
-}
-```
-
-### Retry Strategy Examples
-
-```python
-# Conservative retry strategy (many retries, slow backoff)
-session = BearerAuthSession(
-    token="token",
-    retries=15,
-    backoff_factor=3.0,
-    status_forcelist=[408, 429, 500, 502, 503, 504, 520, 521, 522, 523, 524]
-)
-
-# Aggressive retry strategy (few retries, fast backoff)
-session = BearerAuthSession(
-    token="token",
-    retries=3,
-    backoff_factor=0.5,
+    token="your-token",
+    retries=10,
+    backoff_factor=1.5,
     status_forcelist=[429, 500, 502, 503, 504]
 )
 
-# Rate limit focused (retry on 429, few other retries)
-session = BearerAuthSession(
-    token="token",
-    retries=5,
-    backoff_factor=1.0,
-    status_forcelist=[429]  # Only retry on rate limits
-)
+client = Odyn(base_url="https://api.example.com/", session=session)
 ```
 
-## Parameter Validation Strategy
+- **`retries`**: The total number of retry attempts. Default: `5`.
+- **`backoff_factor`**: A multiplier for calculating the delay between retries. The delay is `backoff_factor * (2 ** (retry_number - 1))`. Default: `2.0`.
+- **`status_forcelist`**: A list of HTTP status codes that will trigger a retry. Default: `[500, 502, 503, 504, 429]`.
 
-Odyn implements comprehensive parameter validation to catch configuration errors early.
+### Backoff Timing Examples
 
-### Validation Flow
+The table below shows the delay (in seconds) for each retry attempt based on the `backoff_factor`.
 
-1. **Logger Validation** - Validated first (needed for other validations)
-2. **URL Validation** - Sanitizes and validates base URL
-3. **Session Validation** - Ensures proper session object
-4. **Timeout Validation** - Validates timeout tuple format
+| Backoff Factor | 1st Retry | 2nd Retry | 3rd Retry | 4th Retry | 5th Retry |
+|----------------|-----------|-----------|-----------|-----------|-----------|
+| **0.5**        | 0.5s      | 1.0s      | 2.0s      | 4.0s      | 8.0s      |
+| **1.0**        | 1.0s      | 2.0s      | 4.0s      | 8.0s      | 16.0s     |
+| **2.0** (Default)| 2.0s      | 4.0s      | 8.0s      | 16.0s     | 32.0s     |
 
-### Validation Rules
+## Input Validation
 
-#### URL Validation
+To prevent common errors, `odyn` performs strict validation on its initial parameters. If validation fails, a descriptive error is raised immediately.
 
-```python
-def validate_url(url: str) -> str:
-    """URL validation rules."""
+- **Logger**: Must be a `loguru.Logger` instance. This is validated first so it can be used in subsequent validation steps.
+- **Base URL**:
+    - Must be a non-empty string.
+    - Must have a valid scheme (`http` or `https`).
+    - Must contain a network location (domain).
+    - Is automatically sanitized to ensure it ends with a `/`.
+- **Session**: Must be an instance of `requests.Session`.
+- **Timeout**:
+    - Must be a tuple.
+    - Must contain exactly two elements.
+    - Both elements must be positive numbers (int or float).
 
-    # Must be a string
-    if not isinstance(url, str):
-        raise InvalidURLError(f"URL must be a string, got {type(url).__name__}")
+## Common Configuration Patterns
 
-    # Must not be empty
-    if not url.strip():
-        raise InvalidURLError("URL cannot be empty")
-
-    # Must have valid scheme
-    parsed = urlparse(url)
-    if not parsed.scheme or parsed.scheme not in ["http", "https"]:
-        raise InvalidURLError(f"URL must have valid scheme (http or https), got {url}")
-
-    # Must have domain
-    if not parsed.netloc:
-        raise InvalidURLError(f"URL must contain valid domain, got {url}")
-
-    # Sanitize (ensure trailing slash)
-    sanitized = url.strip()
-    if not sanitized.endswith("/"):
-        sanitized += "/"
-
-    return sanitized
-```
-
-#### Timeout Validation
-
-```python
-def validate_timeout(timeout: TimeoutType) -> TimeoutType:
-    """Timeout validation rules."""
-
-    # Must be a tuple
-    if not isinstance(timeout, tuple):
-        raise InvalidTimeoutError(f"Timeout must be a tuple, got {type(timeout).__name__}")
-
-    # Must have exactly 2 elements
-    if len(timeout) != 2:
-        raise InvalidTimeoutError(f"Timeout must be a tuple of length 2, got length {len(timeout)}")
-
-    # Both elements must be positive numbers
-    for i, value in enumerate(timeout):
-        if not isinstance(value, (int, float)):
-            raise InvalidTimeoutError(f"Timeout values must be int or float, but value at index {i} is {type(value).__name__}")
-        if value <= 0:
-            raise InvalidTimeoutError(f"Timeout values must be greater than 0, got {value}")
-
-    return timeout
-```
-
-#### Session Validation
-
-```python
-def validate_session(session: requests.Session) -> requests.Session:
-    """Session validation rules."""
-
-    if not isinstance(session, requests.Session):
-        raise InvalidSessionError(f"session must be a Session, got {type(session).__name__}")
-
-    return session
-```
-
-## Configuration Patterns
+Here are some common patterns for managing `odyn` client configuration in your applications.
 
 ### Environment-Based Configuration
+
+A common practice is to configure the client using environment variables, which is ideal for containerized or cloud-native applications.
 
 ```python
 import os
 from odyn import Odyn, BearerAuthSession
 
 def create_client_from_env():
-    """Create client using environment variables."""
-
-    # Get configuration from environment
-    base_url = os.getenv("BC_BASE_URL")
-    token = os.getenv("BC_ACCESS_TOKEN")
-    connect_timeout = int(os.getenv("BC_CONNECT_TIMEOUT", "30"))
-    read_timeout = int(os.getenv("BC_READ_TIMEOUT", "120"))
-    retries = int(os.getenv("BC_RETRIES", "5"))
-    backoff_factor = float(os.getenv("BC_BACKOFF_FACTOR", "2.0"))
-
-    # Create session
+    """Creates a client using settings from environment variables."""
     session = BearerAuthSession(
-        token=token,
-        retries=retries,
-        backoff_factor=backoff_factor
+        token=os.environ["BC_TOKEN"],
+        retries=int(os.getenv("BC_RETRIES", 5)),
+        backoff_factor=float(os.getenv("BC_BACKOFF", 2.0))
     )
 
-    # Create client
     client = Odyn(
-        base_url=base_url,
+        base_url=os.environ["BC_BASE_URL"],
         session=session,
-        timeout=(connect_timeout, read_timeout)
+        timeout=(
+            int(os.getenv("BC_CONNECT_TIMEOUT", 60)),
+            int(os.getenv("BC_READ_TIMEOUT", 60))
+        )
     )
-
     return client
 ```
 
-### Configuration File Pattern
+### Configuration via Factory Pattern
+
+A factory can help create consistently configured clients for different environments (e.g., development vs. production).
 
 ```python
-import yaml
 from odyn import Odyn, BearerAuthSession
 
-def load_config(config_path: str) -> dict:
-    """Load configuration from YAML file."""
-    with open(config_path, 'r') as f:
-        return yaml.safe_load(f)
-
-def create_client_from_config(config: dict):
-    """Create client from configuration dictionary."""
-
-    # Extract configuration
-    odyn_config = config.get("odyn", {})
-    session_config = odyn_config.get("session", {})
-
-    # Create session
-    session = BearerAuthSession(
-        token=session_config["token"],
-        retries=session_config.get("retries", 5),
-        backoff_factor=session_config.get("backoff_factor", 2.0),
-        status_forcelist=session_config.get("status_forcelist", [500, 502, 503, 504, 429])
-    )
-
-    # Create client
-    client = Odyn(
-        base_url=odyn_config["base_url"],
-        session=session,
-        timeout=tuple(odyn_config.get("timeout", [60, 60]))
-    )
-
-    return client
-
-# Example configuration file (config.yaml):
-"""
-odyn:
-  base_url: "https://your-tenant.businesscentral.dynamics.com/api/v2.0/"
-  timeout: [30, 120]
-  session:
-    token: "your-access-token"
-    retries: 5
-    backoff_factor: 2.0
-    status_forcelist: [429, 500, 502, 503, 504]
-"""
-```
-
-### Factory Pattern
-
-```python
-from typing import Optional
-from odyn import Odyn, BearerAuthSession, BasicAuthSession
-
 class OdynClientFactory:
-    """Factory for creating Odyn clients with different configurations."""
+    """A factory for creating pre-configured Odyn clients."""
 
     @staticmethod
-    def create_bearer_client(
-        base_url: str,
-        token: str,
-        timeout: tuple[int, int] = (60, 60),
-        retries: int = 5,
-        backoff_factor: float = 2.0
-    ) -> Odyn:
-        """Create client with Bearer token authentication."""
+    def create(base_url: str, token: str, environment: str = "production") -> Odyn:
+        if environment == "development":
+            session = BearerAuthSession(token=token, retries=3, backoff_factor=1.0)
+            timeout = (10, 60) # Fast timeouts for dev
+        else: # production
+            session = BearerAuthSession(token=token, retries=10, backoff_factor=2.0)
+            timeout = (30, 180) # Conservative timeouts for prod
 
-        session = BearerAuthSession(
-            token=token,
-            retries=retries,
-            backoff_factor=backoff_factor
-        )
-
-        return Odyn(
-            base_url=base_url,
-            session=session,
-            timeout=timeout
-        )
-
-    @staticmethod
-    def create_basic_auth_client(
-        base_url: str,
-        username: str,
-        password: str,
-        timeout: tuple[int, int] = (60, 60),
-        retries: int = 5,
-        backoff_factor: float = 2.0
-    ) -> Odyn:
-        """Create client with Basic authentication."""
-
-        session = BasicAuthSession(
-            username=username,
-            password=password,
-            retries=retries,
-            backoff_factor=backoff_factor
-        )
-
-        return Odyn(
-            base_url=base_url,
-            session=session,
-            timeout=timeout
-        )
-
-    @staticmethod
-    def create_development_client(base_url: str, token: str) -> Odyn:
-        """Create client optimized for development."""
-        return OdynClientFactory.create_bearer_client(
-            base_url=base_url,
-            token=token,
-            timeout=(10, 60),  # Fast timeouts for development
-            retries=3,         # Fewer retries
-            backoff_factor=1.0 # Faster backoff
-        )
-
-    @staticmethod
-    def create_production_client(base_url: str, token: str) -> Odyn:
-        """Create client optimized for production."""
-        return OdynClientFactory.create_bearer_client(
-            base_url=base_url,
-            token=token,
-            timeout=(30, 180), # Conservative timeouts
-            retries=10,        # More retries
-            backoff_factor=2.0 # Standard backoff
-        )
+        return Odyn(base_url=base_url, session=session, timeout=timeout)
 
 # Usage
-factory = OdynClientFactory()
-
-# Development client
-dev_client = factory.create_development_client(
-    base_url="https://dev-tenant.businesscentral.dynamics.com/api/v2.0/",
-    token="dev-token"
-)
-
-# Production client
-prod_client = factory.create_production_client(
-    base_url="https://prod-tenant.businesscentral.dynamics.com/api/v2.0/",
-    token="prod-token"
-)
+# dev_client = OdynClientFactory.create(base_url, token, environment="development")
+# prod_client = OdynClientFactory.create(base_url, token, environment="production")
 ```
 
-## Performance Optimization
+## Monitoring Retry Attempts
 
-### Connection Pooling
+Because retries are handled by the underlying `urllib3` library, they are not logged through `odyn`'s logger by default. To see these logs, you must intercept the standard `logging` library messages and redirect them to `loguru`.
 
-Odyn sessions automatically use connection pooling through `requests.Session`:
-
-```python
-# Reuse session for multiple clients (recommended)
-session = BearerAuthSession("token")
-
-client1 = Odyn(base_url="https://api1.example.com/", session=session)
-client2 = Odyn(base_url="https://api2.example.com/", session=session)
-client3 = Odyn(base_url="https://api3.example.com/", session=session)
-```
-
-### Timeout Optimization
+This is the recommended way to monitor retry behavior and diagnose transient issues.
 
 ```python
-# For small, frequent requests
-fast_client = Odyn(
-    base_url="https://api.example.com/",
-    session=session,
-    timeout=(5, 30)  # Quick timeouts
-)
-
-# For large data transfers
-bulk_client = Odyn(
-    base_url="https://api.example.com/",
-    session=session,
-    timeout=(30, 600)  # Long read timeout for large datasets
-)
-```
-
-### Retry Optimization
-
-```python
-# For stable networks
-stable_session = BearerAuthSession(
-    token="token",
-    retries=3,           # Fewer retries
-    backoff_factor=2.0   # Standard backoff
-)
-
-# For unreliable networks
-unreliable_session = BearerAuthSession(
-    token="token",
-    retries=15,          # More retries
-    backoff_factor=0.5   # Faster backoff
-)
-```
-
-## Monitoring and Debugging
-
-### Enable Debug Logging
-
-```python
+import logging
 from loguru import logger
 
-# Configure detailed logging
-logger.add("odyn_debug.log", level="DEBUG", rotation="1 day")
+# Configure loguru to intercept logs from the standard logging library
+class InterceptHandler(logging.Handler):
+    def emit(self, record: logging.LogRecord) -> None:
+        try:
+            level = logger.level(record.levelname).name
+        except ValueError:
+            level = record.levelno
 
-# Create client with debug logger
-client = Odyn(
-    base_url="https://api.example.com/",
-    session=session,
-    logger=logger.bind(component="odyn-debug")
-)
-```
+        frame, depth = logging.currentframe(), 2
+        while frame and frame.f_code.co_filename == logging.__file__:
+            frame = frame.f_back
+            depth += 1
 
-### Monitor Retry Behavior
-
-```python
-from loguru import logger
-
-def log_retry_attempts(response, *args, **kwargs):
-    """Log retry attempts for monitoring."""
-    if hasattr(response, 'retry') and response.retry:
-        logger.warning(
-            f"Request retried {response.retry.total} times",
-            url=response.url,
-            status_code=response.status_code
+        logger.opt(depth=depth, exception=record.exc_info).log(
+            level, record.getMessage()
         )
 
-# Add retry monitoring to session
-session = BearerAuthSession("token")
-session.hooks["response"].append(log_retry_attempts)
+# Apply the interceptor
+logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
+
+# Now, when a request is retried, you will see a WARNING log from urllib3.
+# Example: WARNING: Retrying (Retry(total=2, connect=None, read=None, ...))
 ```
+
+For more details on logging, see the [Logging](logging.md) documentation.
 
 ## Related Documentation
 
-- [Odyn Client API](../usage/odyn.md) - Core client configuration
-- [Authentication Sessions](../usage/sessions.md) - Session configuration
-- [Exception Handling](../usage/exceptions.md) - Configuration validation errors
-- [Logging](logging.md) - Advanced logging configuration
+- [Odyn Client API](../usage/odyn.md)
+- [Authentication Sessions](../usage/sessions.md)
+- [Logging Guide](logging.md)
+- [Exception Handling](../usage/exceptions.md)
