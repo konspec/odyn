@@ -1,20 +1,29 @@
-# Authentication Sessions
+# Authentication and Session Management
 
-Odyn provides flexible session management for handling authentication with Microsoft Dynamics 365 Business Central. All session classes include built-in retry logic and exponential backoff for handling transient failures.
+This guide is the definitive source for understanding and configuring authentication, retries, and session handling in Odyn.
 
-## Session Classes Overview
+## The Role of the Session
 
-Odyn offers three session classes:
+In Odyn, the `Odyn` client is responsible for building requests and handling responses, but it does not directly manage authentication or network resilience. That responsibility is delegated to a **Session object**.
 
-- **`OdynSession`** - Base session with retry logic (no authentication)
-- **`BasicAuthSession`** - Session with Basic Authentication
-- **`BearerAuthSession`** - Session with Bearer Token Authentication
+This design pattern offers significant flexibility:
+-   **Separation of Concerns**: Your authentication logic (e.g., refreshing a token) is kept separate from your API-calling logic (e.g., fetching customers).
+-   **Configurability**: You can fine-tune retry behavior for different network conditions without altering the client.
+-   **Extensibility**: You can provide your own custom authentication mechanism by creating a custom session class.
 
-## OdynSession
+Every `Odyn` client requires a session object during initialization. This object must be an instance of `requests.Session`. Odyn provides several powerful, pre-built session classes that you can use out of the box.
 
-The base session class that provides automatic retry functionality without authentication.
+---
 
-### Constructor
+## The `OdynSession`: A Foundation with Retries
+
+The cornerstone of session management in Odyn is the `OdynSession` class. This class inherits from `requests.Session` but adds a powerful, automatic retry mechanism with exponential backoff.
+
+It serves as the base class for Odyn's other sessions and is the perfect foundation for your own custom sessions.
+
+### Configuring Retry Behavior
+
+You can customize the retry logic by passing parameters to any of Odyn's built-in session classes.
 
 ```python
 OdynSession(
@@ -24,187 +33,145 @@ OdynSession(
 )
 ```
 
-### Parameters
+-   `retries` (`int`): The total number of retry attempts for a failed request. Must be a positive integer.
+-   `backoff_factor` (`float`): A multiplier used to calculate the delay between retries.
+-   `status_forcelist` (`list[int]`): A list of HTTP status codes that will trigger a retry. By default, this is `[429, 500, 502, 503, 504]`.
 
-- **`retries`** (`int`, optional) - Total number of retry attempts. Defaults to `5`.
-- **`backoff_factor`** (`float`, optional) - Factor for calculating delay between retries. Defaults to `2.0`.
-- **`status_forcelist`** (`list[int] | None`, optional) - HTTP status codes that trigger retries. Defaults to `[500, 502, 503, 504, 429]`.
+### The Exponential Backoff Algorithm
 
-### Default Retry Configuration
+The delay between retries is calculated using this formula, which prevents overwhelming an API that is temporarily struggling:
 
-```python
-DEFAULT_STATUS_FORCELIST = [500, 502, 503, 504, 429]
-```
+`delay = backoff_factor * (2 ** (retry_attempt - 1))`
 
-### Example
+**Example**: With the default `retries=5` and `backoff_factor=2.0`, the delays will be:
+-   Retry 1: `2.0 * (2 ** 0)` = 2 seconds
+-   Retry 2: `2.0 * (2 ** 1)` = 4 seconds
+-   Retry 3: `2.0 * (2 ** 2)` = 8 seconds
+-   Retry 4: `2.0 * (2 ** 3)` = 16 seconds
+-   Retry 5: `2.0 * (2 ** 4)` = 32 seconds
 
-```python
-from odyn import OdynSession
+---
 
-# Basic session with default retry settings
-session = OdynSession()
+## Built-in Session Implementations
 
-# Custom retry configuration
-session = OdynSession(
-    retries=3,
-    backoff_factor=1.5,
-    status_forcelist=[429, 500, 503]
-)
-```
+Odyn provides two ready-to-use sessions for the most common Business Central authentication methods.
 
-### Retry Logic
+### `BearerAuthSession` (Recommended)
 
-The session uses exponential backoff with the formula:
-```
-delay = backoff_factor * (2 ** (retry_number - 1))
-```
-
-**Example backoff timing with default settings:**
-- 1st retry: 2.0 seconds
-- 2nd retry: 4.0 seconds
-- 3rd retry: 8.0 seconds
-- 4th retry: 16.0 seconds
-- 5th retry: 32.0 seconds
-
-## BasicAuthSession
-
-A session that uses Basic Authentication with username and password.
-
-### Constructor
-
-```python
-BasicAuthSession(
-    username: str,
-    password: str,
-    **kwargs: Any
-)
-```
-
-### Parameters
-
-- **`username`** (`str`) - The username for Basic Authentication.
-- **`password`** (`str`) - The password for Basic Authentication.
-- **`**kwargs`** - Additional keyword arguments passed to `OdynSession` (retries, backoff_factor, status_forcelist).
-
-### Security Notice
-
-⚠️ **Warning**: Basic Authentication sends credentials in base64-encoded format. For production use, prefer Bearer Token authentication when possible.
-
-### Example
-
-```python
-from odyn import BasicAuthSession
-
-# Basic authentication with default retry settings
-session = BasicAuthSession("your-username", "your-password")
-
-# With custom retry configuration
-session = BasicAuthSession(
-    username="your-username",
-    password="your-password",
-    retries=10,
-    backoff_factor=0.5,
-    status_forcelist=[429, 500]
-)
-```
-
-## BearerAuthSession
-
-A session that uses Bearer Token authentication (recommended for production).
-
-### Constructor
-
-```python
-BearerAuthSession(
-    token: str,
-    **kwargs: Any
-)
-```
-
-### Parameters
-
-- **`token`** (`str`) - The bearer token for authentication.
-- **`**kwargs`** - Additional keyword arguments passed to `OdynSession` (retries, backoff_factor, status_forcelist).
-
-### Example
+This session handles modern token-based authentication. It extends `OdynSession` and automatically adds the `Authorization: Bearer <your-token>` header to every request.
 
 ```python
 from odyn import BearerAuthSession
 
-# Bearer token authentication with default retry settings
-session = BearerAuthSession("your-access-token")
-
-# With custom retry configuration
+# Create a session with your access token
+# You can also customize the retry logic here
 session = BearerAuthSession(
-    token="your-access-token",
+    token="your-super-secret-access-token",
     retries=3,
-    backoff_factor=1.0,
-    status_forcelist=[429, 500, 502, 503, 504]
+    backoff_factor=1.0
 )
 ```
 
-## Using Sessions with Odyn Client
+### `BasicAuthSession`
 
-### Basic Setup
+This session handles legacy username and password authentication. It extends `OdynSession` and uses the `auth` property of the underlying `requests.Session`.
 
-```python
-from odyn import Odyn, BearerAuthSession
-
-# Create an authenticated session
-session = BearerAuthSession("your-access-token")
-
-# Initialize the client with the session
-client = Odyn(
-    base_url="https://your-tenant.businesscentral.dynamics.com/api/v2.0/",
-    session=session
-)
-
-# Make API calls
-customers = client.get("customers")
-```
-
-### Advanced Configuration
+**Security Warning**: Basic Authentication is less secure than token-based methods. Only use it if your environment does not support modern authentication.
 
 ```python
-from odyn import Odyn, BearerAuthSession
+from odyn import BasicAuthSession
 
-# Create a session with aggressive retry settings for unreliable networks
-session = BearerAuthSession(
-    token="your-access-token",
-    retries=10,
-    backoff_factor=0.5,  # Faster retries
-    status_forcelist=[408, 429, 500, 502, 503, 504, 520, 521, 522, 523, 524]
-)
-
-# Initialize client with custom timeout
-client = Odyn(
-    base_url="https://your-tenant.businesscentral.dynamics.com/api/v2.0/",
-    session=session,
-    timeout=(30, 180)  # 30s connect, 3min read timeout
+# Create a session with your username and Web Service Access Key
+session = BasicAuthSession(
+    username="your-username",
+    password="your-web-service-access-key",
+    retries=10 # Example: more aggressive retries
 )
 ```
 
-## Custom Authentication Strategies
+---
 
-You can create custom authentication by extending `OdynSession`:
+## Creating a Custom Session
+
+You have two primary methods for implementing custom session logic.
+
+### Method 1: Extending `OdynSession` (Recommended)
+
+This is the best approach for most custom authentication scenarios because you **inherit the robust, built-in retry mechanism**.
+
+Follow this pattern to create a session that adds a custom header (e.g., `X-Api-Key`).
+
+#### Step 1: Create a New Session Class
+
+Inherit from `OdynSession`. In the `__init__` method, accept your secret and any `**kwargs`. The `**kwargs` are crucial for allowing users of your class to customize the retry settings.
+
+#### Step 2: Call the Parent Constructor
+
+Call `super().__init__(**kwargs)` to ensure the retry logic is initialized correctly.
+
+#### Step 3: Implement Your Custom Logic
+
+Modify the session as needed. In this case, we'll add a header.
 
 ```python
-from odyn import OdynSession
-import requests
+# custom_sessions.py
+from odyn import OdynSession, Odyn
 
-class CustomAuthSession(OdynSession):
-    """Custom session with API key authentication."""
-
+# Step 1: Inherit from OdynSession
+class ApiKeyAuthSession(OdynSession):
+    """
+    A custom session that authenticates using a static API key in a header.
+    It inherits the retry logic from OdynSession.
+    """
     def __init__(self, api_key: str, **kwargs):
+        # Step 2: Pass retry kwargs to the parent
         super().__init__(**kwargs)
-        self.headers.update({"X-API-Key": api_key})
 
-# Usage
-session = CustomAuthSession("your-api-key", retries=5)
+        if not api_key or not isinstance(api_key, str):
+            raise ValueError("A valid API key (string) is required.")
+
+        # Step 3: Add the custom authentication header
+        self.headers.update({"X-Api-Key": api_key})
+
+# How to use your custom session:
+api_key = "your-secret-api-key"
+
+# You can configure retries just like with the built-in sessions
+session = ApiKeyAuthSession(api_key=api_key, retries=3, backoff_factor=0.5)
+
 client = Odyn(
-    base_url="https://your-tenant.businesscentral.dynamics.com/api/v2.0/",
+    base_url="https://api.businesscentral.dynamics.com/v2.0/your-tenant-id/production/",
     session=session
 )
+
+print("Client created with custom API Key session.")
+# All requests made with this client will now include the X-Api-Key header.
+```
+
+### Method 2: Providing Your Own `requests.Session` (Advanced)
+
+The `Odyn` client will accept *any* object that is an instance of `requests.Session`. This provides maximum flexibility but comes with a major trade-off.
+
+**Warning**: If you provide a plain `requests.Session`, you will **lose Odyn's built-in automatic retry logic**. This approach is only recommended if you have a complex, existing session object (e.g., from a library like `requests-oauthlib`) that already has its own retry and token-refresh mechanisms.
+
+```python
+import requests
+from odyn import Odyn
+
+# An existing, plain requests.Session object
+# Note: This session has NO retry logic.
+custom_session = requests.Session()
+custom_session.headers.update({"X-Custom-Auth": "my-special-credentials"})
+
+# The Odyn client will accept it
+client = Odyn(
+    base_url="https://api.businesscentral.dynamics.com/v2.0/your-tenant-id/production/",
+    session=custom_session
+)
+
+print("Client created with a plain requests.Session.")
+# This client will send the "X-Custom-Auth" header, but it will not
+# automatically retry on 500-series errors or 429s.
 ```
 
 ## Session Validation
