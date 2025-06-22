@@ -202,6 +202,14 @@ max-doc-length = 120
     "S105",     # hardcoded-password-string
     "S106",     # hardcoded-password-func-arg
     "T201",     # print
+    "INP001",   # implicit-namespace-package
+    "N806",     # capitalized-builtins
+    "BLE001",   # blind-except
+    "ANN202",   # missing-return-type-annotation
+    "PT027",    # pytest-raises-too-broad
+    "B017",   # missing-return-type-annotation
+    "SLF001",  # private-member-access
+    "PTH110",  # use-pathlib-for-path-operations
 ]
 
 [tool.ruff.lint.pydocstyle]
