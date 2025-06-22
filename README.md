@@ -9,8 +9,8 @@
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](docs/index.md)
-[![Tests](https://github.com/your-username/odyn/workflows/CI/badge.svg)](https://github.com/your-username/odyn/actions)
-[![Coverage](https://codecov.io/gh/your-username/odyn/branch/main/graph/badge.svg)](https://codecov.io/gh/your-username/odyn)
+[![Tests](https://github.com/konspec/odyn/workflows/CI/badge.svg)](https://github.com/konspec/odyn/actions)
+[![Coverage](https://codecov.io/gh/konspec/odyn/branch/main/graph/badge.svg)](https://codecov.io/gh/konspec/odyn)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 
 ---
