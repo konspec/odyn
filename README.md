@@ -17,17 +17,17 @@
 
 Odyn provides a convenient and feature-rich interface for interacting with Microsoft Dynamics 365 Business Central, including automatic retry mechanisms, pagination handling, and pluggable authentication sessions.
 
-## ✨ Features
+## Features
 
-- **🔒 Type Safety**: Fully typed with comprehensive type annotations for better IDE support and runtime safety
-- **🔄 Automatic Retry Logic**: Built-in exponential backoff retry mechanism for handling transient failures
-- **📄 Smart Pagination**: Automatic handling of OData pagination with transparent multi-page data retrieval
-- **🔐 Flexible Authentication**: Support for Basic Authentication and Bearer Token authentication
-- **📊 Comprehensive Logging**: Detailed logging with loguru integration for debugging and monitoring
-- **⚡ Production Ready**: Robust error handling, validation, and timeout management
-- **🔧 Extensible Design**: Pluggable session management for custom authentication strategies
+- **Type Safety**: Fully typed with comprehensive type annotations for better IDE support and runtime safety.
+- **Automatic Retry Logic**: Built-in exponential backoff retry mechanism for handling transient network failures.
+- **Smart Pagination**: Automatic handling of OData pagination with transparent multi-page data retrieval.
+- **Flexible Authentication**: Pluggable `requests.Session` based authentication. Comes with `BearerAuthSession` and `BasicAuthSession` out of the box.
+- **Comprehensive Logging**: Detailed logging with `loguru` integration for easy debugging and monitoring.
+- **Production Ready**: Robust error handling, validation, and timeout management.
+- **Extensible Design**: Easily extendable to support custom authentication strategies or other session-level features.
 
-## 🚀 Quick Install
+## Quick Install
 
 ```bash
 pip install odyn
@@ -35,7 +35,7 @@ pip install odyn
 
 Or see [full installation instructions](docs/installation.md) for pip, uv, and poetry.
 
-## 📖 Quick Start
+## Quick Start
 
 ```python
 from odyn import Odyn, BearerAuthSession
@@ -64,13 +64,13 @@ filtered_customers = client.get(
 )
 ```
 
-## 🛠️ Requirements
+## Requirements
 
 - **Python 3.12+**
 - **requests** (≥2.32.4)
 - **loguru** (≥0.7.3)
 
-## 📚 Documentation
+## Documentation
 
 - 📚 **Full documentation:** [docs/index.md](docs/index.md)
 
@@ -91,26 +91,53 @@ filtered_customers = client.get(
 - [FAQ](docs/faq.md) - Frequently asked questions
 - [Troubleshooting](docs/troubleshooting.md) - Common issues and solutions
 
-## 🔧 Examples
+## Examples
 
-### Basic Usage
+### Bearer Token Authentication
 ```python
 from odyn import Odyn, BearerAuthSession
 
-session = BearerAuthSession("your-token")
+# Create a session with your bearer token
+session = BearerAuthSession(token="your-access-token")
+
+# Initialize the client
 client = Odyn(
-    base_url="https://your-tenant.businesscentral.dynamics.com/api/v2.0/",
-    session=session
+    base_url="https://api.businesscentral.dynamics.com/v2.0/your-tenant-id/production/",
+    session=session,
 )
 
-# Get all customers
+# Get all customers with automatic pagination handling
 customers = client.get("customers")
+print(f"Retrieved {len(customers)} customers")
 
-# Get items with filtering
-items = client.get("items", params={"$filter": "blocked eq false"})
+# Get the top 10 items, filtering by name and selecting specific fields
+items = client.get(
+    "items",
+    params={
+        "$top": 10,
+        "$filter": "contains(displayName, 'Desk')",
+        "$select": "id,displayName,itemCategoryCode",
+    },
+)
+print(f"Filtered items: {items}")
+```
 
-# Get vendors with custom headers
-vendors = client.get("vendors", headers={"Accept": "application/json;odata.metadata=minimal"})
+### Basic Authentication
+```python
+from odyn import Odyn, BasicAuthSession
+
+# Create a session with your username and web service access key
+session = BasicAuthSession(username="your-username", password="your-web-service-access-key")
+
+# Initialize the client
+client = Odyn(
+    base_url="https://api.businesscentral.dynamics.com/v2.0/your-tenant-id/production/",
+    session=session,
+)
+
+# Get all vendors
+vendors = client.get("vendors")
+print(f"Retrieved {len(vendors)} vendors")
 ```
 
 ### Advanced Configuration
@@ -118,52 +145,64 @@ vendors = client.get("vendors", headers={"Accept": "application/json;odata.metad
 from odyn import Odyn, BearerAuthSession
 from loguru import logger
 
-# Custom logger
+# Bind a custom component to the logger for easy filtering
 custom_logger = logger.bind(component="business-central-client")
 
-# Session with aggressive retry settings
+# Create a session with custom retry settings
+# This example uses a more aggressive retry strategy than the default.
 session = BearerAuthSession(
     token="your-token",
     retries=10,
     backoff_factor=0.5,
-    status_forcelist=[408, 429, 500, 502, 503, 504, 520, 521, 522, 523, 524]
+    status_forcelist=[408, 429, 500, 502, 503, 504],
 )
 
-# Client with custom timeout and logger
+# Initialize a client with a custom timeout and the custom logger
 client = Odyn(
-    base_url="https://your-tenant.businesscentral.dynamics.com/api/v2.0/",
+    base_url="https://api.businesscentral.dynamics.com/v2.0/your-tenant-id/production/",
     session=session,
     logger=custom_logger,
-    timeout=(30, 180)  # 30s connect, 3min read timeout
+    timeout=(10, 60),  # 10s connect timeout, 60s read timeout
 )
 ```
 
 ### Error Handling
 ```python
-from odyn import Odyn, BearerAuthSession
-from odyn import InvalidURLError, InvalidSessionError
+from odyn import (
+    Odyn,
+    BearerAuthSession,
+    InvalidURLError,
+    InvalidSessionError,
+    InvalidTimeoutError,
+    InvalidLoggerError,
+)
 import requests
 
 try:
-    session = BearerAuthSession("your-token")
-    client = Odyn(
-        base_url="https://your-tenant.businesscentral.dynamics.com/api/v2.0/",
-        session=session
-    )
-
-    customers = client.get("customers")
+    # Intentionally create an invalid session
+    session = BearerAuthSession(token=None) # type: ignore
+    client = Odyn(base_url="not-a-valid-url", session=session)
+    client.get("customers")
 
 except InvalidURLError as e:
-    print(f"❌ Invalid URL: {e}")
+    print(f"Invalid URL: {e}")
 except InvalidSessionError as e:
-    print(f"❌ Invalid session: {e}")
+    print(f"Invalid session: {e}")
+except InvalidTimeoutError as e:
+    print(f"Invalid timeout configuration: {e}")
+except InvalidLoggerError as e:
+    print(f"Invalid logger object provided: {e}")
 except requests.exceptions.HTTPError as e:
-    print(f"❌ HTTP Error: {e.response.status_code} - {e.response.text}")
+    # Handle HTTP errors (e.g., 401 Unauthorized, 404 Not Found)
+    print(f"HTTP Error: {e.response.status_code} - {e.response.text}")
 except requests.exceptions.RequestException as e:
-    print(f"❌ Network Error: {e}")
+    # Handle network-related errors (e.g., connection refused)
+    print(f"Network Error: {e}")
+except Exception as e:
+    print(f"An unexpected error occurred: {e}")
 ```
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please see our [Contributing Guide](docs/contributing.md) for details.
 
@@ -171,11 +210,11 @@ We welcome contributions! Please see our [Contributing Guide](docs/contributing.
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/odyn.git
+git clone https://github.com/konspec/odyn.git
 cd odyn
 
-# Install in development mode
-pip install -e .
+# Install dependencies (we recommend using uv)
+uv pip install -e .[dev]
 
 # Run tests
 pytest
@@ -184,20 +223,20 @@ pytest
 ruff check .
 ```
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
+## Support
 
-- 📖 [Documentation](docs/index.md)
-- ❓ [FAQ](docs/faq.md)
-- 🐛 [Troubleshooting](docs/troubleshooting.md)
-- 💬 [Issues](https://github.com/your-username/odyn/issues)
+- [Documentation](docs/index.md)
+- [FAQ](docs/faq.md)
+- [Troubleshooting](docs/troubleshooting.md)
+- [Issues](https://github.com/konspec/odyn/issues)
 
-## 🔗 Related
+## Related
 
-- [Microsoft Dynamics 365 Business Central API](https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/api-reference/v2.0/)
+- [Microsoft Dynamics 365 Business Central OData Web Services](https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/webservices/odata-web-services)
 - [OData V4 Specification](https://docs.oasis-open.org/odata/odata/v4.0/os/part1-protocol/odata-v4.0-os-part1-protocol.html)
 - [requests](https://docs.python-requests.org/) - HTTP library
 - [loguru](https://loguru.readthedocs.io/) - Logging library
