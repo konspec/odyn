@@ -1,106 +1,163 @@
 # Odyn Client API Reference
 
-The `Odyn` class is the main client for interacting with Microsoft Dynamics 365 Business Central OData V4 API. It provides a robust, typed interface with automatic pagination, retry logic, and comprehensive error handling.
+This document provides a detailed API reference for the `odyn.Odyn` client, which is the primary interface for interacting with the Microsoft Dynamics 365 Business Central API.
 
-## Class Overview
+## `Odyn` Class
+
+The `Odyn` client orchestrates API requests, manages endpoint URLs, and handles the automatic pagination of results. It relies on a [Session object](./sessions.md) for authentication and retry logic.
+
+---
+
+## Initialization
+
+An `Odyn` client is initialized with the following constructor:
 
 ```python
 class Odyn:
-    """Python adapter for MS Dynamics 365 Business Central OData V4 API."""
-
-    DEFAULT_TIMEOUT: ClassVar[TimeoutType] = (60, 60)
-    logger: Logger
-    base_url: str
-    session: requests.Session
-    timeout: TimeoutType
+    def __init__(
+        self,
+        base_url: str,
+        session: requests.Session,
+        logger: loguru.Logger | None = None,
+        timeout: tuple[int, int] = (60, 60),
+    ) -> None:
 ```
 
-## Constructor
+### **Parameters**
 
-### `__init__(base_url, session, logger=None, timeout=DEFAULT_TIMEOUT)`
+#### `base_url`
+-   **Type**: `str`
+-   **Description**: The full base URL of your Business Central OData V4 API endpoint. This URL must be well-formed and include the schema (`https://`). The client will sanitize the URL to ensure it ends with a `/`.
+-   **Validation**: The URL must be a valid string, start with `http` or `https` and contain a network location (domain).
+-   **Raises**: `InvalidURLError` if the validation fails.
 
-Initializes the Odyn client with the specified configuration.
+#### `session`
+-   **Type**: `requests.Session`
+-   **Description**: An instance of a `requests.Session` (or a subclass like `OdynSession`) that will be used to perform all HTTP requests. This object is responsible for handling authentication (e.g., adding `Authorization` headers) and retry logic.
+-   **See Also**: [Authentication and Session Management](./sessions.md) for details on creating and configuring sessions.
+-   **Validation**: Must be a valid `requests.Session` instance.
+-   **Raises**: `InvalidSessionError` if the object is not a `requests.Session`.
 
-#### Parameters
+#### `timeout`
+-   **Type**: `tuple[int, int]`
+-   **Default**: `(60, 60)`
+-   **Description**: A tuple specifying the `(connect_timeout, read_timeout)` in seconds for all requests made by the client.
+    -   `connect_timeout`: The time to wait for a connection to be established.
+    -   `read_timeout`: The time to wait for the server to send a response after the connection is established.
+-   **Validation**: Must be a tuple containing two positive `int` or `float` values.
+-   **Raises**: `InvalidTimeoutError` if the validation fails.
 
-- **`base_url`** (`str`) - The base URL of the OData service. Will be sanitized to end with a "/".
-- **`session`** (`requests.Session`) - The requests session to use for HTTP requests. Any authentication should be handled by the session.
-- **`logger`** (`Logger | None`, optional) - The loguru logger to use. If `None`, a default loguru logger is used.
-- **`timeout`** (`TimeoutType`, optional) - The timeout configuration as `(connect_timeout, read_timeout)`. Defaults to `(60, 60)`.
+#### `logger`
+-   **Type**: `loguru.Logger | None`
+-   **Default**: A default, pre-configured `loguru` logger instance.
+-   **Description**: A `loguru` logger instance for structured, context-rich logging. If you provide your own, the client will use it for all its logging output. If `None`, Odyn's default logger is used.
+-   **Validation**: Must be a valid `loguru.Logger` instance.
+-   **Raises**: `InvalidLoggerError` if a non-logger object is provided.
 
-#### Raises
-
-- **`InvalidURLError`** - If the URL is invalid, empty, or has an invalid scheme.
-- **`InvalidSessionError`** - If the session is not a valid `requests.Session` object.
-- **`InvalidLoggerError`** - If the logger is not a valid loguru `Logger` object.
-- **`InvalidTimeoutError`** - If the timeout is not a valid tuple of two positive numbers.
-
-#### Example
+### **Initialization Example**
 
 ```python
 from odyn import Odyn, BearerAuthSession
-
-# Basic initialization
-session = BearerAuthSession("your-token")
-client = Odyn(
-    base_url="https://your-tenant.businesscentral.dynamics.com/api/v2.0/",
-    session=session
-)
-
-# With custom timeout and logger
 from loguru import logger
 
-custom_logger = logger.bind(component="odyn-client")
+# A session to handle authentication and retries
+session = BearerAuthSession(
+    token="your-secret-token",
+    retries=3
+)
+
+# A custom logger to capture context
+custom_logger = logger.bind(service="BusinessCentralClient")
+
+# Initialize the client with advanced configuration
 client = Odyn(
-    base_url="https://your-tenant.businesscentral.dynamics.com/api/v2.0/",
+    base_url="https://api.businesscentral.dynamics.com/v2.0/your-tenant-id/production/",
     session=session,
-    logger=custom_logger,
-    timeout=(30, 120)  # 30s connect, 120s read timeout
+    timeout=(10, 45),  # 10s connect, 45s read
+    logger=custom_logger
 )
 ```
 
-## Core Methods
+---
 
-### `get(endpoint, params=None, headers=None)`
+## Public Attributes
 
-Sends a GET request to the specified endpoint and automatically handles OData pagination.
+Once initialized, you can inspect the following public attributes on a client instance:
 
-#### Parameters
+-   `base_url` (`str`): The sanitized base URL used by the client.
+-   `session` (`requests.Session`): The session object used for requests.
+-   `timeout` (`tuple[int, int]`): The timeout configuration.
+-   `logger` (`loguru.Logger`): The logger instance.
 
-- **`endpoint`** (`str`) - The API endpoint to query (e.g., "customers", "items").
-- **`params`** (`dict[str, Any] | None`, optional) - Query parameters for the request (OData filters, sorting, etc.).
-- **`headers`** (`dict[str, str] | None`, optional) - Additional request headers.
+---
 
-#### Returns
+## Methods
 
-- **`list[dict[str, Any]]`** - A list containing all items retrieved from all pages.
+### `get()`
 
-#### Raises
-
-- **`TypeError`** - If the OData response is malformed (missing 'value' key or 'value' is not a list).
-- **`requests.exceptions.HTTPError`** - For HTTP 4xx or 5xx status codes.
-- **`requests.exceptions.RequestException`** - For network-level errors.
-- **`ValueError`** - If the response is not valid JSON.
-
-#### Example
+This is the primary method for retrieving data from Business Central. It sends a `GET` request and automatically handles OData's server-side pagination.
 
 ```python
-# Basic GET request
-customers = client.get("customers")
+def get(
+    self,
+    endpoint: str,
+    params: dict[str, Any] | None = None,
+    headers: dict[str, str] | None = None,
+) -> list[dict[str, Any]]:
+```
 
-# With OData query parameters
-customers = client.get(
-    "customers",
+#### **Parameters**
+
+-   `endpoint` (`str`): The API endpoint path to query (e.g., `"customers"`, `"salesInvoices"`). This is appended to the `base_url`.
+-   `params` (`dict | None`): A dictionary of OData query parameters (e.g., `"$filter"`, `"$select"`). These are automatically URL-encoded.
+-   `headers` (`dict | None`): Any additional HTTP headers to include in the request, which will be merged with the headers from the session object.
+
+#### **Returns**
+
+-   `list[dict[str, Any]]`: A list containing all records retrieved from the API. If the API response spans multiple pages, this method will fetch all pages and concatenate the results into a single list before returning.
+
+#### **How Pagination Works**
+
+The `get` method inspects the API response for an `@odata.nextLink` key. If this key is present, it indicates more data is available. The client automatically follows this link to fetch the next page of results and continues doing so until all pages have been retrieved. This entire process is transparent to the caller.
+
+#### **Raises**
+
+-   `requests.exceptions.HTTPError`: For any HTTP 4xx (client) or 5xx (server) error responses that are not handled by the session's retry mechanism.
+-   `requests.exceptions.RequestException`: For fundamental network errors (e.g., connection timeout, DNS failure).
+-   `ValueError`: If the API returns a response that is not valid JSON.
+-   `TypeError`: If the API returns a valid JSON response that is not in the expected OData format (e.g., it is missing the `value` key, or the value is not a list).
+
+### `get()` Examples
+
+**1. Simple GET Request**
+This fetches all records from the `items` endpoint.
+
+```python
+# Fetches all items across all pages
+all_items = client.get("items")
+print(f"Retrieved {len(all_items)} items.")
+```
+
+**2. GET Request with OData Parameters**
+This fetches the top 10 vendors, filtered by a specific location code, and selects only three fields to reduce payload size.
+
+```python
+filtered_vendors = client.get(
+    "vendors",
     params={
         "$top": 10,
-        "$filter": "contains(name, 'Adventure')",
-        "$orderby": "name",
-        "$select": "id,name,phoneNumber"
+        "$filter": "locationCode eq 'EAST'",
+        "$select": "number,displayName,blocked"
     }
 )
+```
 
-# With custom headers
-customers = client.get(
+**3. GET Request with Custom Headers**
+You can provide additional headers if a specific API endpoint requires them.
+
+```python
+# The odata.metadata parameter can control the verbosity of the response
+response = client.get(
     "customers",
     headers={"Accept": "application/json;odata.metadata=minimal"}
 )
