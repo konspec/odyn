@@ -1,225 +1,168 @@
-# Getting Started
+# Getting Started with Odyn
 
-This guide will help you set up Odyn and make your first API call to Microsoft Dynamics 365 Business Central.
+This guide provides a complete walkthrough for setting up Odyn and making your first API calls to Microsoft Dynamics 365 Business Central. We will cover the core concepts, provide a complete code example, and show you how to work with the results.
 
 ## Prerequisites
 
-Before you begin, ensure you have:
+Before you start, please ensure you have completed the following:
+1.  **Installed Odyn**: Follow the [Installation Guide](./installation.md) to install Odyn in a virtual environment.
+2.  **Acquired Business Central Credentials**: You must have access to a Business Central tenant and the necessary credentials. This includes:
+    *   Your tenant's specific API base URL.
+    *   An authentication method, such as a Bearer Token (access token) or a username and Web Service Access Key for Basic Authentication.
 
-1. **Odyn installed** - See [Installation](installation.md) for details
-2. **Microsoft Dynamics 365 Business Central access** - You'll need:
-   - A Business Central tenant URL
-   - Authentication credentials (username/password or access token)
+---
 
-## Quick Setup
+## Core Concepts: The Client and The Session
 
-### Step 1: Import Required Classes
+Odyn is designed with a clear separation of concerns, which makes it both flexible and easy to use. The two most important components you will interact with are:
 
-```python
-from odyn import Odyn, BearerAuthSession
-```
+1.  **The `Odyn` Client**: This is the main entry point for all API operations. It handles request building, automatic pagination, logging, and response parsing. You create one instance of the client for a specific Business Central API endpoint.
 
-### Step 2: Create an Authenticated Session
+2.  **The `Session` Object**: This object manages authentication and retry logic. It is passed to the `Odyn` client during initialization. Odyn comes with pre-built sessions:
+    *   `BearerAuthSession`: For modern token-based authentication (recommended).
+    *   `BasicAuthSession`: For legacy username/password authentication.
+    *   `OdynSession`: A base session you can extend for custom authentication strategies.
 
-Choose the authentication method that matches your Business Central setup:
+This design means you can configure your authentication and retry policies once and reuse that session across multiple client instances if needed.
 
-#### Using Bearer Token (Recommended)
+---
 
-```python
-# Create a session with your access token
-session = BearerAuthSession("your-access-token-here")
-```
+## A Complete Example
 
-#### Using Basic Authentication
+Let's walk through a complete, runnable script that demonstrates how to use Odyn. This example fetches a list of customers from Business Central, filtering for specific records and selecting only the fields we need.
 
-```python
-from odyn import BasicAuthSession
-
-# Create a session with username and password
-session = BasicAuthSession("your-username", "your-password")
-```
-
-### Step 3: Initialize the Odyn Client
+Create a new Python file, for example `run_odyn.py`:
 
 ```python
-# Initialize the client with your Business Central URL
-client = Odyn(
-    base_url="https://your-tenant.businesscentral.dynamics.com/api/v2.0/",
-    session=session
-)
-```
-
-### Step 4: Make Your First API Call
-
-```python
-# Fetch customers (this will automatically handle pagination)
-customers = client.get("customers")
-
-# Print the results
-print(f"Retrieved {len(customers)} customers")
-for customer in customers[:3]:  # Show first 3 customers
-    print(f"- {customer.get('name', 'N/A')} (ID: {customer.get('id', 'N/A')})")
-```
-
-## Complete Example
-
-Here's a complete working example:
-
-```python
-from odyn import Odyn, BearerAuthSession
-
-def main():
-    # 1. Set up authentication
-    session = BearerAuthSession("your-access-token-here")
-
-    # 2. Initialize the client
-    client = Odyn(
-        base_url="https://your-tenant.businesscentral.dynamics.com/api/v2.0/",
-        session=session
-    )
-
-    # 3. Make API calls
-    try:
-        # Fetch customers
-        customers = client.get("customers")
-        print(f"✅ Retrieved {len(customers)} customers")
-
-        # Fetch items
-        items = client.get("items")
-        print(f"✅ Retrieved {len(items)} items")
-
-        # Fetch vendors
-        vendors = client.get("vendors")
-        print(f"✅ Retrieved {len(vendors)} vendors")
-
-    except Exception as e:
-        print(f"❌ Error: {e}")
-
-if __name__ == "__main__":
-    main()
-```
-
-## Expected Output Structure
-
-The `client.get()` method returns a list of dictionaries, where each dictionary represents an entity from Business Central:
-
-```python
-# Example response structure
-customers = [
-    {
-        "id": "12345678-1234-1234-1234-123456789012",
-        "number": "10000",
-        "name": "Adventure Works",
-        "address": {
-            "street": "123 Main St",
-            "city": "Seattle",
-            "state": "WA",
-            "country": "US"
-        },
-        "phoneNumber": "+1-555-0123",
-        "email": "contact@adventureworks.com",
-        # ... other fields
-    },
-    # ... more customers
-]
-```
-
-## Working with Query Parameters
-
-You can add OData query parameters to filter, sort, and limit your results:
-
-```python
-# Get only the first 10 customers
-customers = client.get("customers", params={"$top": 10})
-
-# Filter customers by name
-customers = client.get("customers", params={"$filter": "contains(name, 'Adventure')"})
-
-# Sort customers by name
-customers = client.get("customers", params={"$orderby": "name"})
-
-# Select specific fields only
-customers = client.get("customers", params={"$select": "id,name,phoneNumber"})
-
-# Combine multiple parameters
-customers = client.get(
-    "customers",
-    params={
-        "$top": 5,
-        "$filter": "contains(name, 'Adventure')",
-        "$orderby": "name",
-        "$select": "id,name,phoneNumber"
-    }
-)
-```
-
-## Error Handling
-
-Odyn provides comprehensive error handling. Here's how to handle common scenarios:
-
-```python
-from odyn import Odyn, BearerAuthSession
-from odyn import InvalidURLError, InvalidSessionError
+# run_odyn.py
+import os
 import requests
+from odyn import (
+    Odyn,
+    BearerAuthSession,
+    InvalidURLError,
+    InvalidSessionError,
+)
 
-def safe_api_call():
+def get_customers_by_city(city_name: str):
+    """
+    Connects to Business Central and retrieves customers from a specific city.
+    """
+    print(f"Attempting to fetch customers from city: {city_name}...")
+
     try:
-        session = BearerAuthSession("your-token")
-        client = Odyn(
-            base_url="https://your-tenant.businesscentral.dynamics.com/api/v2.0/",
-            session=session
+        # Step 1: Get credentials and configuration
+        # For this example, we load them from environment variables for security.
+        # In a real application, you might use a secure vault or config file.
+        access_token = os.getenv("BC_ACCESS_TOKEN")
+        base_url = os.getenv("BC_BASE_URL")
+
+        if not access_token or not base_url:
+            print("Error: BC_ACCESS_TOKEN and BC_BASE_URL environment variables must be set.")
+            return
+
+        # Step 2: Create an Authenticated Session
+        # The session handles adding the "Authorization: Bearer <token>" header
+        # to every request and also manages automatic retries on transient errors.
+        session = BearerAuthSession(token=access_token)
+
+        # Step 3: Initialize the Odyn Client
+        # The client needs the base URL for the API and the session object.
+        client = Odyn(base_url=base_url, session=session)
+
+        # Step 4: Make the API Call with OData Parameters
+        # We use the params argument to pass OData query options.
+        # This is more robust and readable than manually encoding them in the URL.
+        customers = client.get(
+            "customers",
+            params={
+                "$filter": f"city eq '{city_name}'",
+                "$select": "number,displayName,phoneNumber",
+                "$orderby": "displayName",
+            },
         )
 
-        customers = client.get("customers")
-        return customers
+        # Step 5: Process the Results
+        if not customers:
+            print(f"No customers found in {city_name}.")
+            return
+
+        print(f"Successfully retrieved {len(customers)} customers from {city_name}:")
+        for customer in customers:
+            print(
+                f"  - Name: {customer.get('displayName', 'N/A')}, "
+                f"Number: {customer.get('number', 'N/A')}, "
+                f"Phone: {customer.get('phoneNumber', 'N/A')}"
+            )
 
     except InvalidURLError as e:
-        print(f"❌ Invalid URL: {e}")
+        print(f"Configuration Error: The provided base URL is invalid. {e}")
     except InvalidSessionError as e:
-        print(f"❌ Invalid session: {e}")
+        print(f"Configuration Error: The session object is invalid. {e}")
     except requests.exceptions.HTTPError as e:
-        print(f"❌ HTTP Error: {e.response.status_code} - {e.response.text}")
+        # This catches errors like 401 Unauthorized or 404 Not Found.
+        status = e.response.status_code
+        print(f"HTTP Error: Received status {status}. Check your token and URL.")
+        # For a 401, your access token may be expired or invalid.
+        # For a 404, the base_url or endpoint might be incorrect.
     except requests.exceptions.RequestException as e:
-        print(f"❌ Network Error: {e}")
+        # This catches network-level errors (e.g., connection timeout).
+        print(f"Network Error: Could not connect to the server. {e}")
     except Exception as e:
-        print(f"❌ Unexpected Error: {e}")
+        print(f"An unexpected error occurred: {e}")
 
-    return []
+if __name__ == "__main__":
+    # Replace "New York" with a city you expect to have customers in.
+    get_customers_by_city("New York")
 
-# Use the function
-customers = safe_api_call()
 ```
+
+### How to Run the Example
+
+1.  **Set Environment Variables**: Before running, you must provide your credentials.
+    ```bash
+    # On macOS/Linux
+    export BC_ACCESS_TOKEN="your-super-secret-token-here"
+    export BC_BASE_URL="https://api.businesscentral.dynamics.com/v2.0/your-tenant-id/production/"
+
+    # On Windows (Command Prompt)
+    set BC_ACCESS_TOKEN="your-super-secret-token-here"
+    set BC_BASE_URL="https://api.businesscentral.dynamics.com/v2.0/your-tenant-id/production/"
+    ```
+2.  **Execute the Script**:
+    ```bash
+    python run_odyn.py
+    ```
+
+---
+
+## Working with OData Query Parameters
+
+A key feature of Business Central's API is its support for the OData protocol, which allows you to refine your requests. Odyn makes this easy via the `params` dictionary in `get()` requests.
+
+Here are the most common OData options:
+
+-   `$filter`: Restricts the data returned. Analogous to a `WHERE` clause in SQL.
+    -   `params={"$filter": "blocked eq 'false'"}`
+    -   `params={"$filter": "contains(displayName, 'Chairs')"}`
+-   `$select`: Specifies which fields to return, reducing payload size.
+    -   `params={"$select": "id,number,displayName"}`
+-   `$top`: Limits the number of records returned.
+    -   `params={"$top": 10}`
+-   `$orderby`: Sorts the results.
+    -   `params={"$orderby": "displayName desc"}`
+-   `$expand`: Includes related entities in the response.
+    -   `params={"$expand": "paymentTerm"}`
+
+You can combine these to build powerful, efficient queries, as shown in the main example.
+
+---
 
 ## Next Steps
 
-Now that you've made your first API call, you can:
+Now that you have successfully made your first API call, you are ready to explore more of Odyn's capabilities.
 
-1. **Explore the API**: Learn about [all available endpoints](https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/api-reference/v2.0/)
-2. **Customize Configuration**: See [Configuration](advanced/configuration.md) for timeout and retry settings
-3. **Handle Authentication**: Learn more about [session management](usage/sessions.md)
-4. **Error Handling**: Understand [exception types](usage/exceptions.md) and how to handle them
-5. **Logging**: Configure [logging behavior](advanced/logging.md) for debugging
-
-## Troubleshooting
-
-### Common Issues
-
-**Authentication Errors**
-```
-HTTP Error: 401 - Unauthorized
-```
-**Solution**: Verify your access token or credentials are correct and have the necessary permissions.
-
-**URL Errors**
-```
-Invalid URL: URL must have a valid scheme (http or https)
-```
-**Solution**: Ensure your base URL starts with `https://` and includes the full path to the API.
-
-**Timeout Errors**
-```
-RequestException: Connection timeout
-```
-**Solution**: Check your network connection and consider adjusting timeout settings (see [Configuration](advanced/configuration.md)).
-
-For more detailed troubleshooting, see the [Troubleshooting](troubleshooting.md) guide.
+-   **Authentication**: Dive deeper into [Authentication Sessions](./usage/sessions.md) to learn about custom retry logic.
+-   **Configuration**: Learn how to configure [Timeouts and other settings](./advanced/configuration.md).
+-   **Error Handling**: Get a complete overview of the [Exception classes](./usage/exceptions.md).
+-   **API Reference**: See the full [Odyn Client API Reference](./usage/odyn.md) for details on all methods.
