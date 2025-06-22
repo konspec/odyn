@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, master ]
   pull_request:
     branches: [ main ]
 
@@ -47,7 +47,7 @@ jobs:
 
     - name: Run type checking
       run: |
-        uv run ty src/
+        uv run ty check src/
 
     - name: Run tests with coverage
       run: |
