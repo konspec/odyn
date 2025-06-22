@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13"]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        version: "latest"
+
+    - name: Cache dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          .uv-cache
+          .venv
+        key: ${{ runner.os }}-uv-${{ hashFiles('**/pyproject.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-uv-
+
+    - name: Install dependencies
+      run: |
+        uv sync --dev
+
+    - name: Run linting
+      run: |
+        uv run ruff check src/ tests/
+        uv run ruff format --check src/ tests/
+
+    - name: Run type checking
+      run: |
+        uv run ty src/
+
+    - name: Run tests with coverage
+      run: |
+        uv run pytest --cov=odyn --cov-report=xml --cov-report=term-missing
+
+    - name: Upload coverage to Codecov (oidc)
+      uses: codecov/codecov-action@v5
+      with:
+        fail_ci_if_error: false
+        use_oidc: true
+        verbose: true
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: konspec/odyn
