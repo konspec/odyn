@@ -14,7 +14,7 @@
 [![codecov](https://codecov.io/gh/konspec/odyn/graph/badge.svg?token=H8MK6DP96P)](https://codecov.io/gh/konspec/odyn)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 
-[![PyPI version](https://badge.fury.io/py/odyn.svg)](https://badge.fury.io/py/odyn)
+[![PyPI version](https://img.shields.io/pypi/v/odyn.svg)](https://img.shields.io/pypi/v/odyn)
 
 ---
 
