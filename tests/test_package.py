@@ -38,3 +38,4 @@ def test_public_api_imports() -> None:
     assert InvalidTimeoutError is not None
     assert InvalidURLError is not None
     assert Odyn is not None
+    assert OdynSession is not None
