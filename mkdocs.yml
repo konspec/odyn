@@ -1,0 +1,17 @@
+site_name: Odyn
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Getting Started: getting-started.md
+  - Usage:
+    - Odyn Client: usage/odyn.md
+    - Sessions: usage/sessions.md
+    - Exceptions: usage/exceptions.md
+  - Advanced:
+    - Configuration: advanced/configuration.md
+    - Logging: advanced/logging.md
+  - Contributing: contributing.md
+  - FAQ: faq.md
+  - Troubleshooting: troubleshooting.md

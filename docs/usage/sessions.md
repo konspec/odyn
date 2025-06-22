@@ -328,5 +328,5 @@ client = Odyn(
 
 - [Odyn Client API](odyn.md) - Complete client reference
 - [Exception Handling](exceptions.md) - Understanding session-related errors
-- [Configuration](advanced/configuration.md) - Advanced retry and timeout settings
-- [Logging](advanced/logging.md) - Monitoring session behavior
+- [Configuration](../advanced/configuration.md) - Advanced retry and timeout settings
+- [Logging](../advanced/logging.md) - Monitoring session behavior

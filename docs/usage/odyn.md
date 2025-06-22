@@ -435,4 +435,4 @@ if __name__ == "__main__":
 
 6. **Reuse Sessions**: Create session objects once and reuse them for multiple requests to improve performance.
 
-For more advanced configuration options, see [Configuration](advanced/configuration.md) and [Logging](advanced/logging.md).
+For more advanced configuration options, see [Configuration](../advanced/configuration.md) and [Logging](../advanced/logging.md).
