@@ -1,5 +1,3 @@
-# tests/test_client.py
-
 from collections.abc import Generator
 from typing import TYPE_CHECKING, Any
 from unittest.mock import MagicMock, call, patch
