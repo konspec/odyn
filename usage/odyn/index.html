@@ -1,0 +1,2233 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../../getting-started/">
+      
+      
+        <link rel="next" href="../sessions/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Odyn Client - Odyn</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#odyn-client-api-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Odyn" class="md-header__button md-logo" aria-label="Odyn" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Odyn
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Odyn Client
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Odyn" class="md-nav__button md-logo" aria-label="Odyn" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Odyn
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Installation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Usage
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Usage
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Odyn Client
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Odyn Client
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#odyn-class" class="md-nav__link">
+    <span class="md-ellipsis">
+      Odyn Class
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#initialization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Initialization
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Initialization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#base_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      base_url
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#session" class="md-nav__link">
+    <span class="md-ellipsis">
+      session
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timeout" class="md-nav__link">
+    <span class="md-ellipsis">
+      timeout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logger" class="md-nav__link">
+    <span class="md-ellipsis">
+      logger
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#initialization-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Initialization Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#public-attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Public Attributes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get" class="md-nav__link">
+    <span class="md-ellipsis">
+      get()
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get()">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-pagination-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      How Pagination Works
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#raises" class="md-nav__link">
+    <span class="md-ellipsis">
+      Raises
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      get() Examples
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#internal-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Internal Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Internal Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_requesturl-paramsnone-headersnone-methodget" class="md-nav__link">
+    <span class="md-ellipsis">
+      _request(url, params=None, headers=None, method="GET")
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="_request(url, params=None, headers=None, method=&#34;GET&#34;)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#raises_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Raises
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_build_urlendpoint-paramsnone" class="md-nav__link">
+    <span class="md-ellipsis">
+      _build_url(endpoint, params=None)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="_build_url(endpoint, params=None)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#validation-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Validation Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Validation Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_validate_urlurl" class="md-nav__link">
+    <span class="md-ellipsis">
+      _validate_url(url)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="_validate_url(url)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#raises_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Raises
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_validate_sessionsession" class="md-nav__link">
+    <span class="md-ellipsis">
+      _validate_session(session)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="_validate_session(session)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#raises_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Raises
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_validate_loggerlogger" class="md-nav__link">
+    <span class="md-ellipsis">
+      _validate_logger(logger)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="_validate_logger(logger)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#raises_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Raises
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_validate_timeouttimeout" class="md-nav__link">
+    <span class="md-ellipsis">
+      _validate_timeout(timeout)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="_validate_timeout(timeout)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#raises_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Raises
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attributes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Attributes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#default_timeout" class="md-nav__link">
+    <span class="md-ellipsis">
+      DEFAULT_TIMEOUT
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#base_url_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      base_url
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#session_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      session
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timeout_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      timeout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logger_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      logger
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#special-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Special Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Special Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#__repr__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __repr__()
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="__repr__()">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#returns_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#type-definitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Type Definitions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Type Definitions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#timeouttype" class="md-nav__link">
+    <span class="md-ellipsis">
+      TimeoutType
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complete Example
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sessions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Sessions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Exceptions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Advanced
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Advanced
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Configuration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Logging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FAQ
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#odyn-class" class="md-nav__link">
+    <span class="md-ellipsis">
+      Odyn Class
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#initialization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Initialization
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Initialization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#base_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      base_url
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#session" class="md-nav__link">
+    <span class="md-ellipsis">
+      session
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timeout" class="md-nav__link">
+    <span class="md-ellipsis">
+      timeout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logger" class="md-nav__link">
+    <span class="md-ellipsis">
+      logger
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#initialization-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Initialization Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#public-attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Public Attributes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get" class="md-nav__link">
+    <span class="md-ellipsis">
+      get()
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="get()">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-pagination-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      How Pagination Works
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#raises" class="md-nav__link">
+    <span class="md-ellipsis">
+      Raises
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      get() Examples
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#internal-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Internal Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Internal Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_requesturl-paramsnone-headersnone-methodget" class="md-nav__link">
+    <span class="md-ellipsis">
+      _request(url, params=None, headers=None, method="GET")
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="_request(url, params=None, headers=None, method=&#34;GET&#34;)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#raises_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Raises
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_build_urlendpoint-paramsnone" class="md-nav__link">
+    <span class="md-ellipsis">
+      _build_url(endpoint, params=None)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="_build_url(endpoint, params=None)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#validation-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Validation Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Validation Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_validate_urlurl" class="md-nav__link">
+    <span class="md-ellipsis">
+      _validate_url(url)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="_validate_url(url)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#raises_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Raises
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_validate_sessionsession" class="md-nav__link">
+    <span class="md-ellipsis">
+      _validate_session(session)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="_validate_session(session)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#raises_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Raises
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_validate_loggerlogger" class="md-nav__link">
+    <span class="md-ellipsis">
+      _validate_logger(logger)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="_validate_logger(logger)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#raises_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Raises
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_validate_timeouttimeout" class="md-nav__link">
+    <span class="md-ellipsis">
+      _validate_timeout(timeout)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="_validate_timeout(timeout)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#returns_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#raises_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Raises
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attributes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Attributes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#default_timeout" class="md-nav__link">
+    <span class="md-ellipsis">
+      DEFAULT_TIMEOUT
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#base_url_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      base_url
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#session_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      session
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timeout_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      timeout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logger_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      logger
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#special-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Special Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Special Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#__repr__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __repr__()
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="__repr__()">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#returns_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#type-definitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Type Definitions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Type Definitions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#timeouttype" class="md-nav__link">
+    <span class="md-ellipsis">
+      TimeoutType
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complete Example
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="odyn-client-api-reference">Odyn Client API Reference</h1>
+<p>This document provides a detailed API reference for the <code>odyn.Odyn</code> client, which is the primary interface for interacting with the Microsoft Dynamics 365 Business Central API.</p>
+<h2 id="odyn-class"><code>Odyn</code> Class</h2>
+<p>The <code>Odyn</code> client orchestrates API requests, manages endpoint URLs, and handles the automatic pagination of results. It relies on a <a href="../sessions/">Session object</a> for authentication and retry logic.</p>
+<hr />
+<h2 id="initialization">Initialization</h2>
+<p>An <code>Odyn</code> client is initialized with the following constructor:</p>
+<pre><code class="language-python">class Odyn:
+    def __init__(
+        self,
+        base_url: str,
+        session: requests.Session,
+        logger: loguru.Logger | None = None,
+        timeout: tuple[int, int] = (60, 60),
+    ) -&gt; None:
+</code></pre>
+<h3 id="parameters"><strong>Parameters</strong></h3>
+<h4 id="base_url"><code>base_url</code></h4>
+<ul>
+<li><strong>Type</strong>: <code>str</code></li>
+<li><strong>Description</strong>: The full base URL of your Business Central OData V4 API endpoint. This URL must be well-formed and include the schema (<code>https://</code>). The client will sanitize the URL to ensure it ends with a <code>/</code>.</li>
+<li><strong>Validation</strong>: The URL must be a valid string, start with <code>http</code> or <code>https</code> and contain a network location (domain).</li>
+<li><strong>Raises</strong>: <code>InvalidURLError</code> if the validation fails.</li>
+</ul>
+<h4 id="session"><code>session</code></h4>
+<ul>
+<li><strong>Type</strong>: <code>requests.Session</code></li>
+<li><strong>Description</strong>: An instance of a <code>requests.Session</code> (or a subclass like <code>OdynSession</code>) that will be used to perform all HTTP requests. This object is responsible for handling authentication (e.g., adding <code>Authorization</code> headers) and retry logic.</li>
+<li><strong>See Also</strong>: <a href="../sessions/">Authentication and Session Management</a> for details on creating and configuring sessions.</li>
+<li><strong>Validation</strong>: Must be a valid <code>requests.Session</code> instance.</li>
+<li><strong>Raises</strong>: <code>InvalidSessionError</code> if the object is not a <code>requests.Session</code>.</li>
+</ul>
+<h4 id="timeout"><code>timeout</code></h4>
+<ul>
+<li><strong>Type</strong>: <code>tuple[int, int]</code></li>
+<li><strong>Default</strong>: <code>(60, 60)</code></li>
+<li><strong>Description</strong>: A tuple specifying the <code>(connect_timeout, read_timeout)</code> in seconds for all requests made by the client.<ul>
+<li><code>connect_timeout</code>: The time to wait for a connection to be established.</li>
+<li><code>read_timeout</code>: The time to wait for the server to send a response after the connection is established.</li>
+</ul>
+</li>
+<li><strong>Validation</strong>: Must be a tuple containing two positive <code>int</code> or <code>float</code> values.</li>
+<li><strong>Raises</strong>: <code>InvalidTimeoutError</code> if the validation fails.</li>
+</ul>
+<h4 id="logger"><code>logger</code></h4>
+<ul>
+<li><strong>Type</strong>: <code>loguru.Logger | None</code></li>
+<li><strong>Default</strong>: A default, pre-configured <code>loguru</code> logger instance.</li>
+<li><strong>Description</strong>: A <code>loguru</code> logger instance for structured, context-rich logging. If you provide your own, the client will use it for all its logging output. If <code>None</code>, Odyn's default logger is used.</li>
+<li><strong>Validation</strong>: Must be a valid <code>loguru.Logger</code> instance.</li>
+<li><strong>Raises</strong>: <code>InvalidLoggerError</code> if a non-logger object is provided.</li>
+</ul>
+<h3 id="initialization-example"><strong>Initialization Example</strong></h3>
+<pre><code class="language-python">from odyn import Odyn, BearerAuthSession
+from loguru import logger
+
+# A session to handle authentication and retries
+session = BearerAuthSession(
+    token=&quot;your-secret-token&quot;,
+    retries=3
+)
+
+# A custom logger to capture context
+custom_logger = logger.bind(service=&quot;BusinessCentralClient&quot;)
+
+# Initialize the client with advanced configuration
+client = Odyn(
+    base_url=&quot;https://api.businesscentral.dynamics.com/v2.0/your-tenant-id/production/&quot;,
+    session=session,
+    timeout=(10, 45),  # 10s connect, 45s read
+    logger=custom_logger
+)
+</code></pre>
+<hr />
+<h2 id="public-attributes">Public Attributes</h2>
+<p>Once initialized, you can inspect the following public attributes on a client instance:</p>
+<ul>
+<li><code>base_url</code> (<code>str</code>): The sanitized base URL used by the client.</li>
+<li><code>session</code> (<code>requests.Session</code>): The session object used for requests.</li>
+<li><code>timeout</code> (<code>tuple[int, int]</code>): The timeout configuration.</li>
+<li><code>logger</code> (<code>loguru.Logger</code>): The logger instance.</li>
+</ul>
+<hr />
+<h2 id="methods">Methods</h2>
+<h3 id="get"><code>get()</code></h3>
+<p>This is the primary method for retrieving data from Business Central. It sends a <code>GET</code> request and automatically handles OData's server-side pagination.</p>
+<pre><code class="language-python">def get(
+    self,
+    endpoint: str,
+    params: dict[str, Any] | None = None,
+    headers: dict[str, str] | None = None,
+) -&gt; list[dict[str, Any]]:
+</code></pre>
+<h4 id="parameters_1"><strong>Parameters</strong></h4>
+<ul>
+<li><code>endpoint</code> (<code>str</code>): The API endpoint path to query (e.g., <code>"customers"</code>, <code>"salesInvoices"</code>). This is appended to the <code>base_url</code>.</li>
+<li><code>params</code> (<code>dict | None</code>): A dictionary of OData query parameters (e.g., <code>"$filter"</code>, <code>"$select"</code>). These are automatically URL-encoded.</li>
+<li><code>headers</code> (<code>dict | None</code>): Any additional HTTP headers to include in the request, which will be merged with the headers from the session object.</li>
+</ul>
+<h4 id="returns"><strong>Returns</strong></h4>
+<ul>
+<li><code>list[dict[str, Any]]</code>: A list containing all records retrieved from the API. If the API response spans multiple pages, this method will fetch all pages and concatenate the results into a single list before returning.</li>
+</ul>
+<h4 id="how-pagination-works"><strong>How Pagination Works</strong></h4>
+<p>The <code>get</code> method inspects the API response for an <code>@odata.nextLink</code> key. If this key is present, it indicates more data is available. The client automatically follows this link to fetch the next page of results and continues doing so until all pages have been retrieved. This entire process is transparent to the caller.</p>
+<h4 id="raises"><strong>Raises</strong></h4>
+<ul>
+<li><code>requests.exceptions.HTTPError</code>: For any HTTP 4xx (client) or 5xx (server) error responses that are not handled by the session's retry mechanism.</li>
+<li><code>requests.exceptions.RequestException</code>: For fundamental network errors (e.g., connection timeout, DNS failure).</li>
+<li><code>ValueError</code>: If the API returns a response that is not valid JSON.</li>
+<li><code>TypeError</code>: If the API returns a valid JSON response that is not in the expected OData format (e.g., it is missing the <code>value</code> key, or the value is not a list).</li>
+</ul>
+<h3 id="get-examples"><code>get()</code> Examples</h3>
+<p><strong>1. Simple GET Request</strong>
+This fetches all records from the <code>items</code> endpoint.</p>
+<pre><code class="language-python"># Fetches all items across all pages
+all_items = client.get(&quot;items&quot;)
+print(f&quot;Retrieved {len(all_items)} items.&quot;)
+</code></pre>
+<p><strong>2. GET Request with OData Parameters</strong>
+This fetches the top 10 vendors, filtered by a specific location code, and selects only three fields to reduce payload size.</p>
+<pre><code class="language-python">filtered_vendors = client.get(
+    &quot;vendors&quot;,
+    params={
+        &quot;$top&quot;: 10,
+        &quot;$filter&quot;: &quot;locationCode eq 'EAST'&quot;,
+        &quot;$select&quot;: &quot;number,displayName,blocked&quot;
+    }
+)
+</code></pre>
+<p><strong>3. GET Request with Custom Headers</strong>
+You can provide additional headers if a specific API endpoint requires them.</p>
+<pre><code class="language-python"># The odata.metadata parameter can control the verbosity of the response
+response = client.get(
+    &quot;customers&quot;,
+    headers={&quot;Accept&quot;: &quot;application/json;odata.metadata=minimal&quot;}
+)
+</code></pre>
+<h2 id="internal-methods">Internal Methods</h2>
+<h3 id="_requesturl-paramsnone-headersnone-methodget"><code>_request(url, params=None, headers=None, method="GET")</code></h3>
+<p>Internal method that sends HTTP requests and handles responses.</p>
+<h4 id="parameters_2">Parameters</h4>
+<ul>
+<li><strong><code>url</code></strong> (<code>str</code>) - The full URL for the request.</li>
+<li><strong><code>params</code></strong> (<code>dict[str, Any] | None</code>, optional) - Query parameters.</li>
+<li><strong><code>headers</code></strong> (<code>dict[str, str] | None</code>, optional) - Request headers.</li>
+<li><strong><code>method</code></strong> (<code>str</code>, optional) - HTTP method. Defaults to "GET".</li>
+</ul>
+<h4 id="returns_1">Returns</h4>
+<ul>
+<li><strong><code>dict[str, Any]</code></strong> - The JSON response from the API.</li>
+</ul>
+<h4 id="raises_1">Raises</h4>
+<ul>
+<li><strong><code>requests.exceptions.HTTPError</code></strong> - For HTTP 4xx or 5xx status codes.</li>
+<li><strong><code>requests.exceptions.RequestException</code></strong> - For network-level errors.</li>
+<li><strong><code>ValueError</code></strong> - If the response is not valid JSON.</li>
+</ul>
+<h3 id="_build_urlendpoint-paramsnone"><code>_build_url(endpoint, params=None)</code></h3>
+<p>Builds the full URL for an API request using robust URL joining.</p>
+<h4 id="parameters_3">Parameters</h4>
+<ul>
+<li><strong><code>endpoint</code></strong> (<code>str</code>) - The API endpoint path.</li>
+<li><strong><code>params</code></strong> (<code>dict[str, Any] | None</code>, optional) - Query parameters to append to the URL.</li>
+</ul>
+<h4 id="returns_2">Returns</h4>
+<ul>
+<li><strong><code>str</code></strong> - The fully constructed URL string.</li>
+</ul>
+<h4 id="example">Example</h4>
+<pre><code class="language-python"># Internal usage - builds URLs like:
+# https://api.example.com/customers?$top=10&amp;$filter=contains(name,'Adventure')
+url = client._build_url(&quot;customers&quot;, {&quot;$top&quot;: 10, &quot;$filter&quot;: &quot;contains(name,'Adventure')&quot;})
+</code></pre>
+<h2 id="validation-methods">Validation Methods</h2>
+<h3 id="_validate_urlurl"><code>_validate_url(url)</code></h3>
+<p>Validates and sanitizes the base URL.</p>
+<h4 id="parameters_4">Parameters</h4>
+<ul>
+<li><strong><code>url</code></strong> (<code>str</code>) - The base URL string to validate.</li>
+</ul>
+<h4 id="returns_3">Returns</h4>
+<ul>
+<li><strong><code>str</code></strong> - The sanitized URL, guaranteed to end with a "/".</li>
+</ul>
+<h4 id="raises_2">Raises</h4>
+<ul>
+<li><strong><code>InvalidURLError</code></strong> - If the URL is empty, has an invalid scheme, or is missing a domain.</li>
+</ul>
+<h3 id="_validate_sessionsession"><code>_validate_session(session)</code></h3>
+<p>Validates that the session is a <code>requests.Session</code> object.</p>
+<h4 id="parameters_5">Parameters</h4>
+<ul>
+<li><strong><code>session</code></strong> (<code>requests.Session</code>) - The session object to validate.</li>
+</ul>
+<h4 id="returns_4">Returns</h4>
+<ul>
+<li><strong><code>requests.Session</code></strong> - The validated session object.</li>
+</ul>
+<h4 id="raises_3">Raises</h4>
+<ul>
+<li><strong><code>InvalidSessionError</code></strong> - If the provided object is not a <code>requests.Session</code>.</li>
+</ul>
+<h3 id="_validate_loggerlogger"><code>_validate_logger(logger)</code></h3>
+<p>Validates the logger, returning the default logger if <code>None</code> is provided.</p>
+<h4 id="parameters_6">Parameters</h4>
+<ul>
+<li><strong><code>logger</code></strong> (<code>Logger | None</code>) - The logger object to validate.</li>
+</ul>
+<h4 id="returns_5">Returns</h4>
+<ul>
+<li><strong><code>Logger</code></strong> - A valid Logger instance.</li>
+</ul>
+<h4 id="raises_4">Raises</h4>
+<ul>
+<li><strong><code>InvalidLoggerError</code></strong> - If the provided object is not a loguru <code>Logger</code>.</li>
+</ul>
+<h3 id="_validate_timeouttimeout"><code>_validate_timeout(timeout)</code></h3>
+<p>Validates that the timeout is a tuple of two positive numbers.</p>
+<h4 id="parameters_7">Parameters</h4>
+<ul>
+<li><strong><code>timeout</code></strong> (<code>TimeoutType</code>) - The timeout tuple to validate.</li>
+</ul>
+<h4 id="returns_6">Returns</h4>
+<ul>
+<li><strong><code>TimeoutType</code></strong> - The validated timeout tuple.</li>
+</ul>
+<h4 id="raises_5">Raises</h4>
+<ul>
+<li><strong><code>InvalidTimeoutError</code></strong> - If timeout is not a tuple of two positive numbers.</li>
+</ul>
+<h2 id="attributes">Attributes</h2>
+<h3 id="default_timeout"><code>DEFAULT_TIMEOUT</code></h3>
+<p>Class variable defining the default timeout configuration.</p>
+<pre><code class="language-python">DEFAULT_TIMEOUT: ClassVar[TimeoutType] = (60, 60)  # (connect_timeout, read_timeout)
+</code></pre>
+<h3 id="base_url_1"><code>base_url</code></h3>
+<p>The sanitized base URL of the OData service.</p>
+<pre><code class="language-python">base_url: str  # Always ends with &quot;/&quot;
+</code></pre>
+<h3 id="session_1"><code>session</code></h3>
+<p>The <code>requests.Session</code> object used for making HTTP requests.</p>
+<pre><code class="language-python">session: requests.Session
+</code></pre>
+<h3 id="timeout_1"><code>timeout</code></h3>
+<p>The timeout configuration for requests.</p>
+<pre><code class="language-python">timeout: TimeoutType  # (connect_timeout, read_timeout)
+</code></pre>
+<h3 id="logger_1"><code>logger</code></h3>
+<p>The logger instance used by the client.</p>
+<pre><code class="language-python">logger: Logger
+</code></pre>
+<h2 id="special-methods">Special Methods</h2>
+<h3 id="__repr__"><code>__repr__()</code></h3>
+<p>Returns a string representation of the client.</p>
+<h4 id="returns_7">Returns</h4>
+<ul>
+<li><strong><code>str</code></strong> - A string representation of the Odyn client instance.</li>
+</ul>
+<h4 id="example_1">Example</h4>
+<pre><code class="language-python">client = Odyn(base_url=&quot;https://api.example.com/&quot;, session=session)
+print(client)  # Output: Odyn(base_url='https://api.example.com/', timeout=(60, 60))
+</code></pre>
+<h2 id="type-definitions">Type Definitions</h2>
+<h3 id="timeouttype"><code>TimeoutType</code></h3>
+<pre><code class="language-python">TimeoutType = tuple[int, int] | tuple[float, float]
+</code></pre>
+<p>A type alias for timeout configuration, representing <code>(connect_timeout, read_timeout)</code>.</p>
+<h2 id="complete-example">Complete Example</h2>
+<p>Here's a comprehensive example showing all major features:</p>
+<pre><code class="language-python">from odyn import Odyn, BearerAuthSession
+from loguru import logger
+
+def create_odyn_client():
+    &quot;&quot;&quot;Create and configure an Odyn client with custom settings.&quot;&quot;&quot;
+
+    # Create a custom logger
+    custom_logger = logger.bind(component=&quot;business-central-client&quot;)
+
+    # Create an authenticated session
+    session = BearerAuthSession(&quot;your-access-token&quot;)
+
+    # Initialize the client with custom configuration
+    client = Odyn(
+        base_url=&quot;https://your-tenant.businesscentral.dynamics.com/api/v2.0/&quot;,
+        session=session,
+        logger=custom_logger,
+        timeout=(30, 120)  # 30s connect, 2min read timeout
+    )
+
+    return client
+
+def fetch_business_data(client):
+    &quot;&quot;&quot;Fetch various types of business data with different query parameters.&quot;&quot;&quot;
+
+    # Fetch customers with filtering and sorting
+    customers = client.get(
+        &quot;customers&quot;,
+        params={
+            &quot;$top&quot;: 50,
+            &quot;$filter&quot;: &quot;contains(name, 'Adventure')&quot;,
+            &quot;$orderby&quot;: &quot;name&quot;,
+            &quot;$select&quot;: &quot;id,name,phoneNumber,email&quot;
+        }
+    )
+
+    # Fetch items with pagination (handled automatically)
+    items = client.get(
+        &quot;items&quot;,
+        params={
+            &quot;$filter&quot;: &quot;blocked eq false&quot;,
+            &quot;$orderby&quot;: &quot;description&quot;
+        }
+    )
+
+    # Fetch vendors with custom headers
+    vendors = client.get(
+        &quot;vendors&quot;,
+        headers={
+            &quot;Accept&quot;: &quot;application/json;odata.metadata=minimal&quot;,
+            &quot;Prefer&quot;: &quot;odata.maxpagesize=100&quot;
+        }
+    )
+
+    return {
+        &quot;customers&quot;: customers,
+        &quot;items&quot;: items,
+        &quot;vendors&quot;: vendors
+    }
+
+# Usage
+if __name__ == &quot;__main__&quot;:
+    try:
+        client = create_odyn_client()
+        data = fetch_business_data(client)
+
+        print(f&quot;Retrieved {len(data['customers'])} customers&quot;)
+        print(f&quot;Retrieved {len(data['items'])} items&quot;)
+        print(f&quot;Retrieved {len(data['vendors'])} vendors&quot;)
+
+    except Exception as e:
+        logger.error(f&quot;Error fetching data: {e}&quot;)
+</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<ol>
+<li>
+<p><strong>Use Type Hints</strong>: Leverage the comprehensive type annotations for better IDE support and code safety.</p>
+</li>
+<li>
+<p><strong>Handle Exceptions</strong>: Always wrap API calls in try-catch blocks to handle potential errors gracefully.</p>
+</li>
+<li>
+<p><strong>Use Query Parameters</strong>: Utilize OData query parameters to filter and limit data on the server side.</p>
+</li>
+<li>
+<p><strong>Customize Logging</strong>: Use custom loggers to integrate with your application's logging system.</p>
+</li>
+<li>
+<p><strong>Set Appropriate Timeouts</strong>: Adjust timeout values based on your network conditions and data volume.</p>
+</li>
+<li>
+<p><strong>Reuse Sessions</strong>: Create session objects once and reuse them for multiple requests to improve performance.</p>
+</li>
+</ol>
+<p>For more advanced configuration options, see <a href="../../advanced/configuration/">Configuration</a> and <a href="../../advanced/logging/">Logging</a>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1158 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../faq/">
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Troubleshooting - Odyn</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.342714a4.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#troubleshooting-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Odyn" class="md-header__button md-logo" aria-label="Odyn" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Odyn
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Troubleshooting
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Odyn" class="md-nav__button md-logo" aria-label="Odyn" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Odyn
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Installation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Usage
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Usage
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/odyn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Odyn Client
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/sessions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Sessions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Exceptions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Advanced
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Advanced
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../advanced/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Configuration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../advanced/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Logging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FAQ
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-configuration-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Configuration Errors
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Configuration Errors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#invalidurlerror" class="md-nav__link">
+    <span class="md-ellipsis">
+      InvalidURLError
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalidsessionerror" class="md-nav__link">
+    <span class="md-ellipsis">
+      InvalidSessionError
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalidtimeouterror" class="md-nav__link">
+    <span class="md-ellipsis">
+      InvalidTimeoutError
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalidloggererror" class="md-nav__link">
+    <span class="md-ellipsis">
+      InvalidLoggerError
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-http-network-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. HTTP &amp; Network Errors
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. HTTP &amp; Network Errors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#401-unauthorized" class="md-nav__link">
+    <span class="md-ellipsis">
+      401 Unauthorized
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#429-too-many-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      429 Too Many Requests
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#request-timeouts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Request Timeouts
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connection-ssl-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Connection &amp; SSL Errors
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-api-response-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. API Response Errors
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. API Response Errors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#json-decode-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      JSON Decode Error
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-odata-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      Invalid OData Response
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#general-debugging-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      General Debugging Strategy
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="General Debugging Strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-enable-logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Enable Logging
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-inspect-the-exception" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Inspect the Exception
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-check-the-api-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Check the API Documentation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#still-stuck" class="md-nav__link">
+    <span class="md-ellipsis">
+      Still Stuck?
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-configuration-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Configuration Errors
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Configuration Errors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#invalidurlerror" class="md-nav__link">
+    <span class="md-ellipsis">
+      InvalidURLError
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalidsessionerror" class="md-nav__link">
+    <span class="md-ellipsis">
+      InvalidSessionError
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalidtimeouterror" class="md-nav__link">
+    <span class="md-ellipsis">
+      InvalidTimeoutError
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalidloggererror" class="md-nav__link">
+    <span class="md-ellipsis">
+      InvalidLoggerError
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-http-network-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. HTTP &amp; Network Errors
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. HTTP &amp; Network Errors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#401-unauthorized" class="md-nav__link">
+    <span class="md-ellipsis">
+      401 Unauthorized
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#429-too-many-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      429 Too Many Requests
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#request-timeouts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Request Timeouts
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connection-ssl-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Connection &amp; SSL Errors
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-api-response-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. API Response Errors
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. API Response Errors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#json-decode-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      JSON Decode Error
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-odata-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      Invalid OData Response
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#general-debugging-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      General Debugging Strategy
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="General Debugging Strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-enable-logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Enable Logging
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-inspect-the-exception" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Inspect the Exception
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-check-the-api-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Check the API Documentation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#still-stuck" class="md-nav__link">
+    <span class="md-ellipsis">
+      Still Stuck?
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="troubleshooting-guide">Troubleshooting Guide</h1>
+<p>This guide will help you diagnose and resolve common errors when using the Odyn client. For a list of all custom exceptions, see the <a href="../usage/exceptions/">Exception Reference</a>.</p>
+<hr />
+<p>A good first step for any issue is to <a href="#1-enable-logging">enable detailed logging</a>, which can provide crucial context about the problem.</p>
+<h2 id="1-configuration-errors">1. Configuration Errors</h2>
+<p>These errors are raised by Odyn's internal validation before a network request is made. They indicate a problem with how the client was initialized.</p>
+<h3 id="invalidurlerror">InvalidURLError</h3>
+<ul>
+<li><strong>Symptom</strong>: <code>InvalidURLError: URL must have a valid scheme (http or https)...</code> or <code>URL cannot be empty</code>.</li>
+<li><strong>Cause</strong>: The <code>base_url</code> is missing, malformed, or does not start with <code>http://</code> or <code>https://</code>.</li>
+<li><strong>Solution</strong>: Provide a valid, non-empty base URL.</li>
+</ul>
+<pre><code class="language-python"># Correct
+client = Odyn(base_url=&quot;https://api.example.com/api/v2.0/&quot;, ...)
+</code></pre>
+<h3 id="invalidsessionerror">InvalidSessionError</h3>
+<ul>
+<li><strong>Symptom</strong>: <code>InvalidSessionError: session must be a Session, got &lt;class 'str'&gt;</code>.</li>
+<li><strong>Cause</strong>: The object passed to the <code>session</code> parameter is not an instance of <code>requests.Session</code>.</li>
+<li><strong>Solution</strong>: Pass a valid session object, such as <code>BearerAuthSession</code> or <code>BasicAuthSession</code>.</li>
+</ul>
+<pre><code class="language-python">from odyn import BearerAuthSession
+
+# Correct
+session = BearerAuthSession(&quot;your-token&quot;)
+client = Odyn(..., session=session)
+</code></pre>
+<h3 id="invalidtimeouterror">InvalidTimeoutError</h3>
+<ul>
+<li><strong>Symptom</strong>: <code>InvalidTimeoutError: Timeout must be a tuple...</code> or <code>...must be greater than 0</code>.</li>
+<li><strong>Cause</strong>: The <code>timeout</code> parameter was not a tuple of two positive numbers.</li>
+<li><strong>Solution</strong>: Ensure the timeout is in the format <code>(connect_timeout, read_timeout)</code>.</li>
+</ul>
+<pre><code class="language-python"># Correct
+client = Odyn(..., timeout=(10, 60))
+</code></pre>
+<h3 id="invalidloggererror">InvalidLoggerError</h3>
+<ul>
+<li><strong>Symptom</strong>: <code>InvalidLoggerError: logger must be a Logger, got ...</code></li>
+<li><strong>Cause</strong>: The object passed to the <code>logger</code> parameter is not a <code>loguru.Logger</code> instance.</li>
+<li><strong>Solution</strong>: Provide a valid <code>loguru</code> logger.</li>
+</ul>
+<hr />
+<h2 id="2-http-network-errors">2. HTTP &amp; Network Errors</h2>
+<p>These errors occur during the network request and are typically raised by the underlying <code>requests</code> library.</p>
+<h3 id="401-unauthorized">401 Unauthorized</h3>
+<ul>
+<li><strong>Symptom</strong>: <code>requests.exceptions.HTTPError: 401 Client Error: Unauthorized for url: ...</code></li>
+<li><strong>Cause</strong>: The access token is invalid, expired, or lacks the required permissions.</li>
+<li><strong>Solution</strong>:<ol>
+<li>Ensure your access token is correct and not expired.</li>
+<li>Verify the associated application has the correct API permissions in Business Central.</li>
+</ol>
+</li>
+</ul>
+<h3 id="429-too-many-requests">429 Too Many Requests</h3>
+<ul>
+<li><strong>Symptom</strong>: <code>requests.exceptions.HTTPError: 429 Client Error: Too Many Requests for url: ...</code></li>
+<li><strong>Cause</strong>: The Business Central API is rate-limiting your client due to too many requests in a short period.</li>
+<li><strong>Solution</strong>: Adjust the retry settings on your session to use a higher <code>backoff_factor</code> or more <code>retries</code>.</li>
+</ul>
+<pre><code class="language-python"># Increase backoff to wait longer between retries
+session = BearerAuthSession(..., backoff_factor=3.0, retries=10)
+</code></pre>
+<p><strong>See</strong>: <a href="../advanced/configuration/">Advanced Configuration</a></p>
+<h3 id="request-timeouts">Request Timeouts</h3>
+<ul>
+<li><strong>Symptom</strong>: <code>requests.exceptions.ConnectTimeout</code> or <code>requests.exceptions.ReadTimeout</code>.</li>
+<li><strong>Cause</strong>: The request took longer than the configured <code>timeout</code> values. This is distinct from <code>InvalidTimeoutError</code>.</li>
+<li><strong>Solution</strong>: Increase the <code>connect</code> or <code>read</code> timeout values in the client configuration.</li>
+</ul>
+<pre><code class="language-python"># Increase read timeout to 5 minutes for a long-running query
+client = Odyn(..., timeout=(15, 300))
+</code></pre>
+<h3 id="connection-ssl-errors">Connection &amp; SSL Errors</h3>
+<ul>
+<li><strong>Symptom</strong>: <code>requests.exceptions.ConnectionError</code> or <code>requests.exceptions.SSLError</code>.</li>
+<li><strong>Cause</strong>: A network problem (e.g., DNS, firewall, proxy) or an SSL certificate issue is preventing a connection.</li>
+<li><strong>Solution</strong>: Check your network environment and ensure your system's root certificates are up to date.</li>
+</ul>
+<hr />
+<h2 id="3-api-response-errors">3. API Response Errors</h2>
+<p>These errors indicate that the client received a response from the API, but the data was not in the expected format.</p>
+<h3 id="json-decode-error">JSON Decode Error</h3>
+<ul>
+<li><strong>Symptom</strong>: <code>ValueError: Failed to decode JSON from response</code>.</li>
+<li><strong>Cause</strong>: The API returned a non-JSON response, which can happen if there is a server-side error that produces an HTML error page.</li>
+<li><strong>Solution</strong>: Enable logging to inspect the raw response body. The endpoint you are calling may be incorrect or the server may be down.</li>
+</ul>
+<h3 id="invalid-odata-response">Invalid OData Response</h3>
+<ul>
+<li><strong>Symptom</strong>: <code>TypeError: OData response format is invalid: 'value' key is missing...</code></li>
+<li><strong>Cause</strong>: The API response, while valid JSON, does not follow the expected OData structure (i.e., it's missing the <code>value</code> key for a collection).</li>
+<li><strong>Solution</strong>:<ol>
+<li>Confirm your endpoint URL is correct.</li>
+<li>Ensure you are querying a collection endpoint (e.g., <code>/customers</code>) and not a single entity endpoint (e.g., <code>/customers(some_id)</code>).</li>
+</ol>
+</li>
+</ul>
+<hr />
+<h2 id="general-debugging-strategy">General Debugging Strategy</h2>
+<p>If you're not sure what the problem is, follow these steps:</p>
+<h3 id="1-enable-logging">1. Enable Logging</h3>
+<p>The most effective way to debug is to enable detailed logging. This will show you the exact requests being made, the responses received, and any validation warnings.</p>
+<pre><code class="language-python">import sys
+from loguru import logger
+
+# Send detailed logs to a file and INFO-level logs to the console
+logger.add(&quot;debug.log&quot;, level=&quot;DEBUG&quot;)
+logger.add(sys.stderr, level=&quot;INFO&quot;)
+
+# Pass the logger to the client
+client = Odyn(..., logger=logger)
+</code></pre>
+<p><strong>See</strong>: <a href="../advanced/logging/">Logging Guide</a></p>
+<h3 id="2-inspect-the-exception">2. Inspect the Exception</h3>
+<p>Examine the full traceback to understand where the error originated. An error from <code>odyn._exceptions</code> is a client-side validation issue, while an error from <code>requests.exceptions</code> is a network or HTTP issue.</p>
+<h3 id="3-check-the-api-documentation">3. Check the API Documentation</h3>
+<p>Consult the <a href="https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/api-reference/v2.0/">Business Central API Docs</a> to ensure your endpoints and parameters are correct.</p>
+<hr />
+<h2 id="still-stuck">Still Stuck?</h2>
+<p>If you're still having trouble, please <a href="https://github.com/kon-fin/odyn/issues">open an issue</a> and provide as much detail as possible, including logs and code to reproduce the problem.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>
