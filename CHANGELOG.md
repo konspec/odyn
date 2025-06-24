@@ -1,3 +1,9 @@
+## v1.0.4 (2025-06-24)
+
+### Fix
+
+- Moved mkdocs to dev dependency
+
 ## v1.0.3 (2025-06-22)
 
 ### Fix
